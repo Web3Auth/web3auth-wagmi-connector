@@ -207,6 +207,7 @@ export class Web3AuthConnector extends Connector {
 
   async disconnect(): Promise<void> {
     await this.web3AuthInstance.logout();
+    this.provider = null;
   }
 
   protected onAccountsChanged(accounts: string[]): void {
