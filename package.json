@@ -1,0 +1,82 @@
+{
+  "name": "wagmi-web3auth-connector",
+  "version": "0.1.0",
+  "description": "wagmi connector to connect with web3auth SDK",
+  "main": "dist/wagmiWeb3authConnector.cjs.js",
+  "module": "dist/wagmiWeb3authConnector.esm.js",
+  "unpkg": "dist/wagmiWeb3authConnector.umd.min.js",
+  "jsdelivr": "dist/wagmiWeb3authConnector.umd.min.js",
+  "types": "dist/types/index.d.ts",
+  "repository": "",
+  "license": "MIT",
+  "keywords": [],
+  "scripts": {
+    "dev": "torus-scripts start",
+    "build": "torus-scripts build",
+    "lint": "eslint --fix 'src/**/*.ts'",
+    "prepack": "yarn run build",
+    "pre-commit": "lint-staged --cwd ."
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.24.0",
+    "@toruslabs/openlogin-jrpc": "^2.5.0",
+    "@wagmi/core": "^0.5.3",
+    "@web3auth/base": "^1.1.4",
+    "@web3auth/core": "^1.1.4",
+    "@web3auth/openlogin-adapter": "^1.1.4",
+    "@web3auth/ui": "^1.1.4",
+    "lodash-es": "^4.17.21",
+    "loglevel": "^1.8.0"
+  },
+  "devDependencies": {
+    "@toruslabs/eslint-config-typescript": "^1.0.6",
+    "@toruslabs/openlogin": "^2.5.0",
+    "@toruslabs/torus-scripts": "^1.0.9",
+    "@types/node": "^16",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.30.7",
+    "@wagmi/core": "^0.5.3",
+    "changeset": "^0.2.6",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-mocha": "^10.1.0",
+    "eslint-plugin-n": "^15.2.4",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-tsdoc": "^0.2.16",
+    "ethers": "^5.6.9",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.0.0",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "ethers": "^5.6.9"
+  },
+  "lint-staged": {
+    "!(*d).ts": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ]
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14.17.0",
+    "npm": ">=6.x"
+  }
+}
