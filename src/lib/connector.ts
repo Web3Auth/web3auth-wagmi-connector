@@ -23,9 +23,9 @@ const IS_SERVER = typeof window === "undefined";
 export class Web3AuthConnector extends Connector {
   ready = !IS_SERVER;
 
-  readonly id = "web3auth";
+  readonly id = "web3Auth";
 
-  readonly name = "Web3Auth";
+  readonly name = "web3Auth";
 
   provider: SafeEventEmitterProvider;
 
@@ -33,7 +33,7 @@ export class Web3AuthConnector extends Connector {
 
   isModalOpen = false;
 
-  web3authOptions: Options;
+  web3AuthOptions: Options;
 
   private loginModal: LoginModal;
 
@@ -41,14 +41,10 @@ export class Web3AuthConnector extends Connector {
 
   constructor(config: { chains?: Chain[]; options: Options }) {
     super(config);
-    this.web3authOptions = config.options;
+    this.web3AuthOptions = config.options;
     const chainId = config.options.chainId ? parseInt(config.options.chainId, 16) : 1;
-    const chainConfig = this.chains.filter((chain) => {
-      if (chain.id === chainId) {
-        return true;
-      }
-      return false;
-    });
+    const chainConfig = this.chains.filter((x) => x.id === chainId);
+
     const defaultChainConfig = getChainConfig(CHAIN_NAMESPACES.EIP155, config.options.chainId || "0x1");
     let finalChainConfig: CustomChainConfig = {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
@@ -67,6 +63,7 @@ export class Web3AuthConnector extends Connector {
       };
     }
     this.web3AuthInstance = new Web3AuthCore({
+      clientId: config.options.clientId,
       enableLogging: config.options.enableLogging,
       storageKey: config.options.storageKey,
       chainConfig: {

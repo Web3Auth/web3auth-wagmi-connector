@@ -12,7 +12,7 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "wagmi": "0.6.3",
-    "wagmi-web3auth-connector": "file:../../",
+    "@web3auth/web3auth-wagmi-connector": "file:../../",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { Web3AuthConnector } from "wagmi-web3auth-connector";
+import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 
 export const rainbowWeb3AuthConnector = ({ chains }) => ({
   id: "web3auth",
@@ -10,7 +10,7 @@ export const rainbowWeb3AuthConnector = ({ chains }) => ({
       chains: chains,
       options: {
         enableLogging: true,
-        clientId: "local",
+        clientId: "YOUR_CLIENT_ID", // Get your own client id from https://dashboard.web3auth.io
         network: "testnet",
         chainId: "0x1"
       },

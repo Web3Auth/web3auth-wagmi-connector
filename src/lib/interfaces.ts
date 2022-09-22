@@ -65,6 +65,15 @@ export interface UIConfig {
   loginMethodConfig?: LoginMethodConfig;
 }
 export interface Options extends OpenLoginOptions {
+  /**
+   * Web3Auth Client Id, you can obtain this from the web3auth developer dashboard by visiting
+   * https://dashboard.web3auth.io
+   */
+  clientId: string;
+
+  /**
+   * ChainId in hex/number that you want to connect with.
+   */
   chainId?: string;
   /**
    * setting to true will enable logs
