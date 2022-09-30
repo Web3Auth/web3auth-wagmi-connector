@@ -11,6 +11,7 @@ import {
 } from "@web3auth/base";
 import { Web3AuthCore } from "@web3auth/core";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
 import LoginModal, { getAdapterSocialLogins, LOGIN_MODAL_EVENTS, OPENLOGIN_PROVIDERS } from "@web3auth/ui";
 import { ethers, Signer } from "ethers";
 import { getAddress } from "ethers/lib/utils";
@@ -38,6 +39,8 @@ export class Web3AuthConnector extends Connector {
   private loginModal: LoginModal;
 
   private socialLoginAdapter: OpenloginAdapter;
+
+  private walletPlugin: TorusWalletConnectorPlugin;
 
   constructor(config: { chains?: Chain[]; options: Options }) {
     super(config);
@@ -80,6 +83,22 @@ export class Web3AuthConnector extends Connector {
     });
 
     this.web3AuthInstance.configureAdapter(this.socialLoginAdapter);
+
+    if (this.options.addPlugin) {
+      this.walletPlugin = new TorusWalletConnectorPlugin({
+        torusWalletOpts: {},
+        walletInitOptions: {
+          whiteLabel: {
+            theme: { isDark: false, colors: { primary: "#00a8ff" } },
+            logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+            logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
+          },
+          useWalletConnect: true,
+          enableLogging: true,
+        },
+      });
+      this.web3AuthInstance.addPlugin(this.walletPlugin);
+    }
 
     this.loginModal = new LoginModal({
       theme: this.options.uiConfig?.theme,

@@ -101,4 +101,11 @@ export interface Options extends OpenLoginOptions {
   displayErrorsOnModal?: boolean;
 
   socialLoginConfig: Pick<OpenloginLoginParams, "dappShare" | "appState" | "mfaLevel" | "sessionTime">;
+
+  /**
+   * Whether to add wallet plugin to web3auth instance
+   *
+   * @defaultValue `false`
+   */
+  addPlugin?: boolean;
 }

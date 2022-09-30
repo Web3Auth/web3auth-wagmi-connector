@@ -26,6 +26,7 @@
     "@web3auth/core": "^2.1.2",
     "@web3auth/openlogin-adapter": "^2.1.2",
     "@web3auth/ui": "^2.1.2",
+    "@web3auth/torus-wallet-connector-plugin": "^2.1.2",
     "lodash-es": "^4.17.21",
     "loglevel": "^1.8.0"
   },
