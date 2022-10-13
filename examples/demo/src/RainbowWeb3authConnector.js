@@ -16,8 +16,6 @@ const torusPlugin = new TorusWalletConnectorPlugin({
   },
 });
 
-const userInfo = {};
-
 const name = "My App Name";
 const iconUrl = "https://web3auth.io/docs/contents/logo-ethereum.png";
 
