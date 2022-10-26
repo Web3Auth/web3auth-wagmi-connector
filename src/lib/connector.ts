@@ -76,6 +76,9 @@ export class Web3AuthConnector extends Connector {
       adapterSettings: {
         ...config.options,
       },
+      loginSettings: {
+        ...config.options.socialLoginConfig
+      },
       chainConfig: finalChainConfig,
     });
 
