@@ -118,11 +118,11 @@ export class Web3AuthConnector extends Connector {
       // if there is a user logged in, return the user
       if (isLoggedIn) {
         const provider = await this.getProvider();
-
+        const chainId = await this.getChainId();
         return {
           provider,
           chain: {
-            id: 0,
+            id: chainId,
             unsupported: false,
           },
           account: await this.getAccount(),
@@ -148,11 +148,11 @@ export class Web3AuthConnector extends Connector {
             provider.on("chainChanged", this.onChainChanged);
             provider.on("disconnect", this.onDisconnect);
           }
-
+          const chainId = await this.getChainId();
           return resolve({
             account,
             chain: {
-              id: 0,
+              id: chainId,
               unsupported: false,
             },
             provider,
