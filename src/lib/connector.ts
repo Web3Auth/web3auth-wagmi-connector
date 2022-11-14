@@ -76,6 +76,9 @@ export class Web3AuthConnector extends Connector {
       adapterSettings: {
         ...config.options,
       },
+      loginSettings: {
+        ...(config.options?.socialLoginConfig || {}),
+      },
       chainConfig: finalChainConfig,
     });
 
@@ -94,7 +97,12 @@ export class Web3AuthConnector extends Connector {
 
   async connect(): Promise<Required<ConnectorData>> {
     try {
+      this.emit("message", {
+        type: "connecting",
+      });
+
       await this.loginModal.initModal();
+
       this.loginModal.addSocialLogins(
         WALLET_ADAPTERS.OPENLOGIN,
         getAdapterSocialLogins(WALLET_ADAPTERS.OPENLOGIN, this.socialLoginAdapter, this.options.uiConfig?.loginMethodConfig),
@@ -125,6 +133,11 @@ export class Web3AuthConnector extends Connector {
       const elem = document.getElementById("w3a-container");
       elem.style.zIndex = "10000000000";
       return await new Promise((resolve, reject) => {
+        this.loginModal.once(LOGIN_MODAL_EVENTS.MODAL_VISIBILITY, (isVisible: boolean) => {
+          if (!isVisible && !this.web3AuthInstance.provider) {
+            return reject(new Error("User closed popup"));
+          }
+        });
         this.web3AuthInstance.once(ADAPTER_EVENTS.CONNECTED, async () => {
           const signer = await this.getSigner();
           const account = await signer.getAddress();
