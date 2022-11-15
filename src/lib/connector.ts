@@ -126,7 +126,6 @@ export class Web3AuthConnector extends Connector {
         if (provider.on) {
           provider.on("accountsChanged", this.onAccountsChanged.bind(this));
           provider.on("chainChanged", this.onChainChanged.bind(this));
-          provider.on("disconnect", this.onDisconnect.bind(this));
         }
         const unsupported = this.isChainUnsupported(chainId);
 
@@ -157,7 +156,6 @@ export class Web3AuthConnector extends Connector {
           if (provider.on) {
             provider.on("accountsChanged", this.onAccountsChanged.bind(this));
             provider.on("chainChanged", this.onChainChanged.bind(this));
-            provider.on("disconnect", this.onDisconnect.bind(this));
           }
           const chainId = await this.getChainId();
           const unsupported = this.isChainUnsupported(chainId);
