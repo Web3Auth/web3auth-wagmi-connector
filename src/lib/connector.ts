@@ -214,11 +214,19 @@ export class Web3AuthConnector extends Connector {
 
   async getChainId(): Promise<number> {
     try {
-      const networkOptions = this.socialLoginAdapter.chainConfigProxy;
-      if (typeof networkOptions === "object") {
-        const chainID = networkOptions.chainId;
-        if (chainID) {
-          return normalizeChainId(chainID);
+      const provider = await this.getProvider();
+      if (!provider) {
+        const networkOptions = this.socialLoginAdapter.chainConfigProxy;
+        if (typeof networkOptions === "object") {
+          const chainID = networkOptions.chainId;
+          if (chainID) {
+            return normalizeChainId(chainID);
+          }
+        }
+      } else {
+        const chainId = await provider.request({ method: "eth_chainId" });
+        if (chainId) {
+          return normalizeChainId(chainId as string);
         }
       }
       throw new Error("Chain ID is not defined");
