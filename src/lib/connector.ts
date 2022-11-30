@@ -51,15 +51,19 @@ export class Web3AuthConnector extends Connector {
       ...defaultChainConfig,
     };
     if (chainConfig.length > 0) {
+      let currentChain = chainConfig[0];
+      if (config.options.chainId) {
+        currentChain = chainConfig.find((chain) => chain.id === normalizeChainId(config.options.chainId));
+      }
       finalChainConfig = {
         ...finalChainConfig,
         chainNamespace: CHAIN_NAMESPACES.EIP155,
-        chainId: config.options.chainId || "0x1",
-        rpcTarget: chainConfig[0].rpcUrls.default,
-        displayName: chainConfig[0].name,
-        tickerName: chainConfig[0].nativeCurrency?.name,
-        ticker: chainConfig[0].nativeCurrency?.symbol,
-        blockExplorer: chainConfig[0]?.blockExplorers.default?.url,
+        chainId: `0x${currentChain.id.toString(16)}`,
+        rpcTarget: currentChain.rpcUrls.default,
+        displayName: currentChain.name,
+        tickerName: currentChain.nativeCurrency?.name,
+        ticker: currentChain.nativeCurrency?.symbol,
+        blockExplorer: currentChain?.blockExplorers.default?.url,
       };
     }
     this.web3AuthInstance = new Web3AuthCore({
@@ -77,7 +81,7 @@ export class Web3AuthConnector extends Connector {
         ...config.options,
       },
       loginSettings: {
-        ...config.options.socialLoginConfig
+        ...(config.options?.socialLoginConfig || {}),
       },
       chainConfig: finalChainConfig,
     });
@@ -97,7 +101,12 @@ export class Web3AuthConnector extends Connector {
 
   async connect(): Promise<Required<ConnectorData>> {
     try {
+      this.emit("message", {
+        type: "connecting",
+      });
+
       await this.loginModal.initModal();
+
       this.loginModal.addSocialLogins(
         WALLET_ADAPTERS.OPENLOGIN,
         getAdapterSocialLogins(WALLET_ADAPTERS.OPENLOGIN, this.socialLoginAdapter, this.options.uiConfig?.loginMethodConfig),
@@ -114,11 +123,17 @@ export class Web3AuthConnector extends Connector {
       if (isLoggedIn) {
         const provider = await this.getProvider();
         const chainId = await this.getChainId();
+        if (provider.on) {
+          provider.on("accountsChanged", this.onAccountsChanged.bind(this));
+          provider.on("chainChanged", this.onChainChanged.bind(this));
+        }
+        const unsupported = this.isChainUnsupported(chainId);
+
         return {
           provider,
           chain: {
             id: chainId,
-            unsupported: false,
+            unsupported,
           },
           account: await this.getAccount(),
         };
@@ -128,22 +143,28 @@ export class Web3AuthConnector extends Connector {
       const elem = document.getElementById("w3a-container");
       elem.style.zIndex = "10000000000";
       return await new Promise((resolve, reject) => {
+        this.loginModal.once(LOGIN_MODAL_EVENTS.MODAL_VISIBILITY, (isVisible: boolean) => {
+          if (!isVisible && !this.web3AuthInstance.provider) {
+            return reject(new Error("User closed popup"));
+          }
+        });
         this.web3AuthInstance.once(ADAPTER_EVENTS.CONNECTED, async () => {
           const signer = await this.getSigner();
           const account = await signer.getAddress();
           const provider = await this.getProvider();
 
           if (provider.on) {
-            provider.on("accountsChanged", this.onAccountsChanged);
-            provider.on("chainChanged", this.onChainChanged);
-            provider.on("disconnect", this.onDisconnect);
+            provider.on("accountsChanged", this.onAccountsChanged.bind(this));
+            provider.on("chainChanged", this.onChainChanged.bind(this));
           }
           const chainId = await this.getChainId();
+          const unsupported = this.isChainUnsupported(chainId);
+
           return resolve({
             account,
             chain: {
               id: chainId,
-              unsupported: false,
+              unsupported,
             },
             provider,
           });
@@ -191,16 +212,61 @@ export class Web3AuthConnector extends Connector {
 
   async getChainId(): Promise<number> {
     try {
-      const networkOptions = this.socialLoginAdapter.chainConfigProxy;
-      if (typeof networkOptions === "object") {
-        const chainID = networkOptions.chainId;
-        if (chainID) {
-          return normalizeChainId(chainID);
+      const provider = await this.getProvider();
+      if (!provider) {
+        const networkOptions = this.socialLoginAdapter.chainConfigProxy;
+        if (typeof networkOptions === "object") {
+          const chainID = networkOptions.chainId;
+          if (chainID) {
+            return normalizeChainId(chainID);
+          }
+        }
+      } else {
+        const chainId = await provider.request({ method: "eth_chainId" });
+        if (chainId) {
+          return normalizeChainId(chainId as string);
         }
       }
       throw new Error("Chain ID is not defined");
     } catch (error) {
       log.error("error", error);
+      throw error;
+    }
+  }
+
+  async switchChain(chainId: number) {
+    try {
+      const chain = this.chains.find((x) => x.id === chainId);
+      if (!chain) throw new Error(`Unsupported chainId: ${chainId}`);
+      const provider = this.getProvider();
+      if (!provider) throw new Error("Please login first");
+      // eslint-disable-next-line no-console
+      console.log("chain", chain);
+      this.provider.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: `0x${chain.id.toString(16)}`,
+            chainName: chain.name,
+            rpcUrls: [chain.rpcUrls.default],
+            blockExplorerUrls: [chain.blockExplorers?.default?.url],
+            nativeCurrency: {
+              symbol: chain.nativeCurrency?.symbol || "ETH",
+            },
+          },
+        ],
+      });
+      await this.provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [
+          {
+            chainId: `0x${chain.id.toString(16)}`,
+          },
+        ],
+      });
+      return chain;
+    } catch (error) {
+      log.error("Error: Cannot change chain", error);
       throw error;
     }
   }
@@ -213,6 +279,10 @@ export class Web3AuthConnector extends Connector {
   protected onAccountsChanged(accounts: string[]): void {
     if (accounts.length === 0) this.emit("disconnect");
     else this.emit("change", { account: getAddress(accounts[0]) });
+  }
+
+  protected isChainUnsupported(chainId: number): boolean {
+    return !this.chains.some((x) => x.id === chainId);
   }
 
   protected onChainChanged(chainId: string | number): void {
