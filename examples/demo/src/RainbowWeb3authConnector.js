@@ -1,20 +1,4 @@
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
-import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
-
-const torusPlugin = new TorusWalletConnectorPlugin({
-  torusWalletOpts: {
-    buttonPosition: "bottom-left",
-  },
-  walletInitOptions: {
-    whiteLabel: {
-      theme: { isDark: true, colors: { primary: "#00a8ff" } },
-      logoDark: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
-      logoLight: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
-    },
-    useWalletConnect: true,
-    enableLogging: true,
-  },
-});
 
 const name = "My App Name";
 const iconUrl = "https://web3auth.io/docs/contents/logo-ethereum.png";
@@ -46,7 +30,6 @@ export const rainbowWeb3AuthConnector = ({ chains }) => ({
         },
       },
     });
-    connector.web3AuthInstance.addPlugin(torusPlugin);
     return {
       connector,
     };
