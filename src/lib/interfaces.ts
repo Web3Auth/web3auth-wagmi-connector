@@ -1,4 +1,5 @@
 import type { OpenLoginOptions } from "@toruslabs/openlogin";
+import { LoginConfig } from "@toruslabs/openlogin-jrpc";
 import { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 
 export type LoginMethodConfig = Record<
@@ -64,6 +65,11 @@ export interface UIConfig {
 
   loginMethodConfig?: LoginMethodConfig;
 }
+
+export interface SocialLoginParams extends OpenloginLoginParams {
+  loginConfig?: LoginConfig;
+}
+
 export interface Options extends OpenLoginOptions {
   /**
    * Web3Auth Client Id, you can obtain this from the web3auth developer dashboard by visiting
@@ -105,7 +111,7 @@ export interface Options extends OpenLoginOptions {
   /**
    * Params for social login.
    */
-  socialLoginConfig: OpenloginLoginParams;
+  socialLoginConfig: SocialLoginParams;
 
   /**
    * Whether to show Web3Auth modal or not.
