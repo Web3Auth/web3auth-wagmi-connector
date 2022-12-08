@@ -28,6 +28,24 @@ export const rainbowWeb3AuthConnector = ({ chains }) => ({
           defaultLanguage: "en",
           dark: true, // whether to enable dark mode. defaultValue: false
         },
+        // optional - custom authentication
+        socialLoginConfig: {
+          loginConfig: {
+            google: {
+              name: "Custom Google Auth Login",
+              verifier: "web3auth-core-google",
+              typeOfLogin: "google",
+              clientId:
+                "774338308167-q463s7kpvja16l4l0kko3nb925ikds2p.apps.googleusercontent.com", //use your app client id you got from google
+            },
+            facebook: {
+              name: "Custom Facebook Auth Login",
+              verifier: "web3auth-core-facebook",
+              typeOfLogin: "facebook",
+              clientId: "1222658941886084", //use your app client id you got from facebook
+            },
+          }
+        }
       },
     });
     return {

@@ -1,5 +1,5 @@
 {
-  "name": "demo-with-plugin",
+  "name": "demo-without-modal",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,7 +13,6 @@
     "react-scripts": "5.0.1",
     "wagmi": "0.6.3",
     "@web3auth/web3auth-wagmi-connector": "file:../../",
-    "@web3auth/torus-wallet-connector-plugin": "^2.1.3",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
