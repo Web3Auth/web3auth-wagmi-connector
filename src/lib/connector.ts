@@ -146,8 +146,11 @@ export class Web3AuthConnector extends Connector {
         this.loginModal.open();
         const elem = document.getElementById("w3a-container");
         elem.style.zIndex = "10000000000";
-      } else {
+      } else if (this.options.socialLoginConfig?.loginProvider in TypeOfLogin) {
         this.web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, this.options.socialLoginConfig);
+      } else {
+        log.error("please provide a valid loginProvider within socialLoginConfig when useModal is false");
+        throw new UserRejectedRequestError("please provide a loginProvider within socialLoginConfig when useModal is false");
       }
       return await new Promise((resolve, reject) => {
         this.loginModal.once(LOGIN_MODAL_EVENTS.MODAL_VISIBILITY, (isVisible: boolean) => {
