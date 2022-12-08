@@ -105,7 +105,7 @@ export class Web3AuthConnector extends Connector {
         type: "connecting",
       });
 
-      if (this.options.useModal) {
+      if (this.options.useModal !== false) {
         await this.loginModal.initModal();
 
         this.loginModal.addSocialLogins(
@@ -142,11 +142,11 @@ export class Web3AuthConnector extends Connector {
         };
       }
 
-      if (this.options.useModal) {
+      if (this.options.useModal !== false) {
         this.loginModal.open();
         const elem = document.getElementById("w3a-container");
         elem.style.zIndex = "10000000000";
-      } else if (this.options.socialLoginConfig?.loginProvider in TypeOfLogin) {
+      } else if (this.options.socialLoginConfig?.loginProvider) {
         this.web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, this.options.socialLoginConfig);
       } else {
         log.error("please provide a valid loginProvider within socialLoginConfig when useModal is false");
@@ -251,8 +251,6 @@ export class Web3AuthConnector extends Connector {
       if (!chain) throw new Error(`Unsupported chainId: ${chainId}`);
       const provider = this.getProvider();
       if (!provider) throw new Error("Please login first");
-      // eslint-disable-next-line no-console
-      console.log("chain", chain);
       this.provider.request({
         method: "wallet_addEthereumChain",
         params: [
