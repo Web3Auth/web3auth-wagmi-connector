@@ -75,12 +75,14 @@ export interface Options extends OpenLoginOptions {
    * ChainId in hex/number that you want to connect with.
    */
   chainId?: string;
+
   /**
    * setting to true will enable logs
    *
    * @defaultValue false
    */
   enableLogging?: boolean;
+
   /**
    * setting to "local" will persist social login session accross browser tabs.
    *
@@ -100,5 +102,15 @@ export interface Options extends OpenLoginOptions {
    */
   displayErrorsOnModal?: boolean;
 
-  socialLoginConfig: Pick<OpenloginLoginParams, "dappShare" | "appState" | "mfaLevel" | "sessionTime">;
+  /**
+   * Params for social login.
+   */
+  socialLoginConfig: OpenloginLoginParams;
+
+  /**
+   * Whether to show Web3Auth modal or not.
+   *
+   * @defaultValue `true`
+   */
+  useModal?: boolean;
 }

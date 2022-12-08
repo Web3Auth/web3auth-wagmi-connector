@@ -28,6 +28,10 @@ export const rainbowWeb3AuthConnector = ({ chains }) => ({
           defaultLanguage: "en",
           dark: true, // whether to enable dark mode. defaultValue: false
         },
+        useModal: false, // whether to use modal or not. defaultValue: true
+        socialLoginConfig: {
+          loginProvider: "google",
+        }
       },
     });
     return {

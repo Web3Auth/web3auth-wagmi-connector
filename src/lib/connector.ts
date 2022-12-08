@@ -105,13 +105,16 @@ export class Web3AuthConnector extends Connector {
         type: "connecting",
       });
 
-      await this.loginModal.initModal();
+      if (this.options.useModal) {
+        await this.loginModal.initModal();
 
-      this.loginModal.addSocialLogins(
-        WALLET_ADAPTERS.OPENLOGIN,
-        getAdapterSocialLogins(WALLET_ADAPTERS.OPENLOGIN, this.socialLoginAdapter, this.options.uiConfig?.loginMethodConfig),
-        this.options.uiConfig?.loginMethodsOrder || OPENLOGIN_PROVIDERS
-      );
+        this.loginModal.addSocialLogins(
+          WALLET_ADAPTERS.OPENLOGIN,
+          getAdapterSocialLogins(WALLET_ADAPTERS.OPENLOGIN, this.socialLoginAdapter, this.options.uiConfig?.loginMethodConfig),
+          this.options.uiConfig?.loginMethodsOrder || OPENLOGIN_PROVIDERS
+        );
+      }
+
       if (this.web3AuthInstance.status !== ADAPTER_STATUS.READY) {
         await this.web3AuthInstance.init();
       }
@@ -139,15 +142,20 @@ export class Web3AuthConnector extends Connector {
         };
       }
 
-      this.loginModal.open();
-      const elem = document.getElementById("w3a-container");
-      elem.style.zIndex = "10000000000";
+      if (this.options.useModal) {
+        this.loginModal.open();
+        const elem = document.getElementById("w3a-container");
+        elem.style.zIndex = "10000000000";
+      } else {
+        this.web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, this.options.socialLoginConfig);
+      }
       return await new Promise((resolve, reject) => {
         this.loginModal.once(LOGIN_MODAL_EVENTS.MODAL_VISIBILITY, (isVisible: boolean) => {
           if (!isVisible && !this.web3AuthInstance.provider) {
             return reject(new Error("User closed popup"));
           }
         });
+
         this.web3AuthInstance.once(ADAPTER_EVENTS.CONNECTED, async () => {
           const signer = await this.getSigner();
           const account = await signer.getAddress();
