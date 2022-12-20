@@ -1,55 +1,62 @@
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
+import { Web3Auth } from "@web3auth/modal";
+import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { CHAIN_NAMESPACES } from "@web3auth/base";
 
 const name = "My App Name";
 const iconUrl = "https://web3auth.io/docs/contents/logo-ethereum.png";
 
-export const rainbowWeb3AuthConnector = ({ chains }) => ({
-  id: "web3auth",
-  name,
-  iconUrl,
-  iconBackground: "#fff",
-  createConnector: () => {
-    const connector = new Web3AuthConnector({
-      chains: chains,
-      options: {
-        enableLogging: true,
-        clientId: "YOUR_CLIENT_ID", // Get your own client id from https://dashboard.web3auth.io
-        network: "cyan", // cyan, testnet, mainnet
-        chainId: chains[0].chainId,
-        uiConfig: {
-          theme: "light", // light or dark
-          appLogo: iconUrl,
-        },
-        uxMode: "popup", // popup or redirect
-        whiteLabel: {
-          name,
-          logoLight: iconUrl,
-          logoDark: iconUrl,
-          defaultLanguage: "en",
-          dark: true, // whether to enable dark mode. defaultValue: false
-        },
-        // optional - custom authentication
-        socialLoginConfig: {
-          loginConfig: {
-            google: {
-              name: "Custom Google Auth Login",
-              verifier: "web3auth-core-google",
-              typeOfLogin: "google",
-              clientId:
-                "774338308167-q463s7kpvja16l4l0kko3nb925ikds2p.apps.googleusercontent.com", //use your app client id you got from google
-            },
-            facebook: {
-              name: "Custom Facebook Auth Login",
-              verifier: "web3auth-core-facebook",
-              typeOfLogin: "facebook",
-              clientId: "1222658941886084", //use your app client id you got from facebook
-            },
-          }
-        }
+export const rainbowWeb3AuthConnector = ({ chains }) => {
+  // Create Web3Auth Instance
+  const web3AuthInstance = new Web3Auth({
+    clientId: "YOUR_CLIENT_ID",
+    chainConfig: {
+      chainNamespace: CHAIN_NAMESPACES.EIP155,
+      chainId: chains[0].id.toString(16),
+      rpcTarget: chains[0].rpcUrls.default, // This is the public RPC we have added, please pass on your own endpoint while creating an app
+      displayName: chains[0].name,
+      tickerName: chains[0].nativeCurrency?.name,
+      ticker: chains[0].nativeCurrency?.symbol,
+      blockExplorer: chains[0]?.blockExplorers.default?.url,
+    },
+    uiConfig: {
+      theme: "dark",
+      loginMethodsOrder: ["facebook", "google"],
+      defaultLanguage: "en",
+      appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
+    },
+  });
+
+  // Add openlogin adapter for customisations
+  const openloginAdapterInstance = new OpenloginAdapter({
+    adapterSettings: {
+      network: "cyan",
+      uxMode: "popup", 
+      whiteLabel: {
+        name: "Your app Name",
+        logoLight: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+        logoDark: "https://web3auth.io/images/w3a-D-Favicon-1.svg",
+        defaultLanguage: "en",
+        dark: true, // whether to enable dark mode. defaultValue: false
       },
-    });
-    return {
-      connector,
-    };
-  },
-});
+    },
+  });
+  web3AuthInstance.configureAdapter(openloginAdapterInstance);
+  return ({
+    id: "web3auth",
+    name,
+    iconUrl,
+    iconBackground: "#fff",
+    createConnector: () => {
+      const connector = new Web3AuthConnector({
+        chains: chains,
+        options: { 
+          web3AuthInstance,
+        },
+      });
+      return {
+        connector,
+      };
+    },
+  })
+};
