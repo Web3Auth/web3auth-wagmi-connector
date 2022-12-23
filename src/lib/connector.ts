@@ -1,5 +1,5 @@
 import { Chain, Connector, ConnectorData, normalizeChainId, UserRejectedRequestError } from "@wagmi/core";
-import { ADAPTER_EVENTS, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTERS } from "@web3auth/base";
+import { ADAPTER_EVENTS, ADAPTER_STATUS, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { IWeb3AuthModal } from "@web3auth/modal";
 import { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import { LOGIN_MODAL_EVENTS } from "@web3auth/ui";
@@ -43,7 +43,7 @@ export class Web3AuthConnector extends Connector {
         type: "connecting",
       });
 
-      if (this.web3AuthInstance.status === "not_ready") {
+      if (this.web3AuthInstance.status === ADAPTER_STATUS.NOT_READY) {
         if (isIWeb3AuthModal(this.web3AuthInstance)) {
           await this.web3AuthInstance.initModal();
         } else if (this.loginParams) {
