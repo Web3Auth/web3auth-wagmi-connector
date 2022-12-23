@@ -42,15 +42,16 @@ export class Web3AuthConnector extends Connector {
       this.emit("message", {
         type: "connecting",
       });
-      // eslint-disable-next-line no-console
-      console.log(this.web3AuthInstance);
-      if (isIWeb3AuthModal(this.web3AuthInstance)) {
-        await this.web3AuthInstance.initModal();
-      } else if (this.loginParams) {
-        await this.web3AuthInstance.init();
-      } else {
-        log.error("please provide a valid loginParams when not using @web3auth/modal");
-        throw new UserRejectedRequestError("please provide a valid loginParams when not using @web3auth/modal");
+
+      if (this.web3AuthInstance.status === "not_ready") {
+        if (isIWeb3AuthModal(this.web3AuthInstance)) {
+          await this.web3AuthInstance.initModal();
+        } else if (this.loginParams) {
+          await this.web3AuthInstance.init();
+        } else {
+          log.error("please provide a valid loginParams when not using @web3auth/modal");
+          throw new UserRejectedRequestError("please provide a valid loginParams when not using @web3auth/modal");
+        }
       }
 
       // Check if there is a user logged in
