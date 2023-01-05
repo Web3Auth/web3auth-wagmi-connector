@@ -1,34 +1,20 @@
 import "@rainbow-me/rainbowkit/styles.css";
 
-import {
-  ConnectButton,
-  connectorsForWallets,
-  RainbowKitProvider,
-  wallet,
-} from "@rainbow-me/rainbowkit";
-import { chain, createClient, WagmiConfig, configureChains } from "wagmi";
+import { ConnectButton, connectorsForWallets, RainbowKitProvider, wallet } from "@rainbow-me/rainbowkit";
+import { createClient, WagmiConfig, configureChains, mainnet, polygon } from "wagmi";
 import { rainbowWeb3AuthConnector } from "./RainbowWeb3authConnector";
-import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector"
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { publicProvider } from 'wagmi/providers/public';
+import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon ],
-  [
-    alchemyProvider({ apiKey: "7wSu45FYTMHUO4HJkHjQwX4HFkb7k9Ui"}),
-    alchemyProvider({ apiKey: "fGXusgBUDC-OPy6XI8IFRvu1i7sbWsYj"}),
-    publicProvider()
-  ]
+  [mainnet, polygon],
+  [alchemyProvider({ apiKey: "7wSu45FYTMHUO4HJkHjQwX4HFkb7k9Ui" }), alchemyProvider({ apiKey: "fGXusgBUDC-OPy6XI8IFRvu1i7sbWsYj" }), publicProvider()]
 );
 const connectors = connectorsForWallets([
   {
     groupName: "Recommended",
-    wallets: [
-      wallet.rainbow({ chains }),
-      wallet.walletConnect({ chains }),
-      wallet.metaMask({ chains }),
-      rainbowWeb3AuthConnector({ chains }),
-    ],
+    wallets: [wallet.rainbow({ chains }), wallet.walletConnect({ chains }), wallet.metaMask({ chains }), rainbowWeb3AuthConnector({ chains })],
   },
 ]);
 const wagmiClient = createClient({
@@ -51,8 +37,7 @@ export default function App() {
             alignItems: "center",
             justifyContent: "center",
             fontFamily: "sans-serif",
-          }}
-        >
+          }}>
           <ConnectButton />
         </div>
       </RainbowKitProvider>
