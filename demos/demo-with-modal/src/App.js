@@ -1,9 +1,10 @@
 import "@rainbow-me/rainbowkit/styles.css";
 
-import { ConnectButton, connectorsForWallets, RainbowKitProvider, wallet } from "@rainbow-me/rainbowkit";
-import { createClient, WagmiConfig, configureChains, mainnet, polygon } from "wagmi";
+import { ConnectButton, connectorsForWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { createClient, WagmiConfig, configureChains } from "wagmi";
 import { rainbowWeb3AuthConnector } from "./RainbowWeb3authConnector";
-import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
+import { mainnet, polygon } from 'wagmi/chains';
+import { walletConnectWallet, rainbowWallet, metaMaskWallet } from '@rainbow-me/rainbowkit/wallets';
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -14,10 +15,11 @@ const { chains, provider } = configureChains(
 const connectors = connectorsForWallets([
   {
     groupName: "Recommended",
-    wallets: [wallet.rainbow({ chains }), wallet.walletConnect({ chains }), wallet.metaMask({ chains }), rainbowWeb3AuthConnector({ chains })],
+    wallets: [rainbowWallet({ chains }), walletConnectWallet({ chains }), metaMaskWallet({ chains }), rainbowWeb3AuthConnector({ chains })],
   },
 ]);
 const wagmiClient = createClient({
+  autoConnect: false,
   connectors,
   provider,
 });

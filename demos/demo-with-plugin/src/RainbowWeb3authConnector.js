@@ -25,6 +25,7 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
       loginMethodsOrder: ["facebook", "google"],
       defaultLanguage: "en",
       appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
+      modalZIndex: "2147483647",
     },
   });
 
