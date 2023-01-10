@@ -13,7 +13,7 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
     chainConfig: {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
       chainId: "0x"+chains[0].id.toString(16),
-      rpcTarget: chains[0].rpcUrls.default, // This is the public RPC we have added, please pass on your own endpoint while creating an app
+      rpcTarget: chains[0].rpcUrls.default.http[0], // This is the public RPC we have added, please pass on your own endpoint while creating an app
       displayName: chains[0].name,
       tickerName: chains[0].nativeCurrency?.name,
       ticker: chains[0].nativeCurrency?.symbol,

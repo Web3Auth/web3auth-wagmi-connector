@@ -146,7 +146,7 @@ export class Web3AuthConnector extends Connector {
           {
             chainId: `0x${chain.id.toString(16)}`,
             chainName: chain.name,
-            rpcUrls: [chain.rpcUrls.default],
+            rpcUrls: [chain.rpcUrls.default.http],
             blockExplorerUrls: [chain.blockExplorers?.default?.url],
             nativeCurrency: {
               symbol: chain.nativeCurrency?.symbol || "ETH",
