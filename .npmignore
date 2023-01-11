@@ -110,3 +110,4 @@ scripts/
 .prettierignore
 .prettierrc.yaml
 .babelrc
+demos/
