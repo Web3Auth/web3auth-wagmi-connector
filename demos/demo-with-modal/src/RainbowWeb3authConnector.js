@@ -1,7 +1,7 @@
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 import { Web3Auth } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { CHAIN_NAMESPACES } from "@web3auth/base";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 
 const name = "My App Name";
 const iconUrl = "https://web3auth.io/docs/contents/logo-ethereum.png";
@@ -20,8 +20,8 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
       blockExplorer: chains[0]?.blockExplorers.default?.url,
     },
     uiConfig: {
-      theme: "dark",
-      loginMethodsOrder: ["facebook", "google"],
+      theme: "light",
+      loginMethodsOrder: ["twitter", "google"],
       defaultLanguage: "en",
       appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
       modalZIndex: "2147483647",
@@ -54,20 +54,35 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
         chains: chains,
         options: { 
           web3AuthInstance,
-          openLoginModalConfig: {
-            loginMethods: {
-              google: {
-                name: "google login",
-                logoDark: "url to your custom logo which will shown in dark mode",
-              },
-              facebook: {
-                // it will hide the facebook option from the Web3Auth modal.
-                name: "facebook login",
-                showOnModal: false,
+          modalConfig: {
+            [WALLET_ADAPTERS.OPENLOGIN]: {
+              loginMethods: {
+                google: {
+                  name: "google login",
+                  logoDark: "url to your custom logo which will shown in dark mode",
+                },
+                facebook: {
+                  // it will hide the facebook option from the Web3Auth modal.
+                  name: "facebook login",
+                  showOnModal: false,
+                },
               },
             },
-            // setting it to false will hide all social login methods from modal.
-            showOnModal: true,
+            [WALLET_ADAPTERS.WALLET_CONNECT_V1]: {
+              showOnModal: false,
+            },
+            [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
+              showOnModal: false,
+            },
+            [WALLET_ADAPTERS.TORUS_EVM]: {
+              showOnModal: false,
+            },
+            [WALLET_ADAPTERS.METAMASK]: {
+              showOnModal: false,
+            },
+            [WALLET_ADAPTERS.COINBASE]: {
+              showOnModal: false,
+            },
           }
         },
       });
