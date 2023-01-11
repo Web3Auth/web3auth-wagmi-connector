@@ -25,6 +25,7 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
       defaultLanguage: "en",
       appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
       modalZIndex: "2147483647",
+      appName: name,
     },
   });
 
@@ -53,6 +54,21 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
         chains: chains,
         options: { 
           web3AuthInstance,
+          openLoginModalConfig: {
+            loginMethods: {
+              google: {
+                name: "google login",
+                logoDark: "url to your custom logo which will shown in dark mode",
+              },
+              facebook: {
+                // it will hide the facebook option from the Web3Auth modal.
+                name: "facebook login",
+                showOnModal: false,
+              },
+            },
+            // setting it to false will hide all social login methods from modal.
+            showOnModal: true,
+          }
         },
       });
       return {

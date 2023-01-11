@@ -1,12 +1,12 @@
 import { Address, Chain, Connector, ConnectorData, normalizeChainId, UserRejectedRequestError } from "@wagmi/core";
 import { ADAPTER_STATUS, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTERS } from "@web3auth/base";
-import type { IWeb3AuthModal } from "@web3auth/modal";
-import { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
+import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
+import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import { ethers, Signer } from "ethers";
 import { getAddress } from "ethers/lib/utils";
 import log from "loglevel";
 
-import { Options } from "./interfaces";
+import type { Options } from "./interfaces";
 
 const IS_SERVER = typeof window === "undefined";
 
@@ -25,10 +25,13 @@ export class Web3AuthConnector extends Connector {
 
   loginParams: OpenloginLoginParams | null;
 
+  openLoginModalConfig: ModalConfig | null;
+
   constructor(config: { chains?: Chain[]; options: Options }) {
     super(config);
     this.web3AuthInstance = config.options.web3AuthInstance;
     this.loginParams = config.options.loginParams || null;
+    this.openLoginModalConfig = config.options.openLoginModalConfig || null;
     this.initialChainId = config.chains[0].id;
   }
 
@@ -44,7 +47,11 @@ export class Web3AuthConnector extends Connector {
 
       if (this.web3AuthInstance.status === ADAPTER_STATUS.NOT_READY) {
         if (isIWeb3AuthModal(this.web3AuthInstance)) {
-          await this.web3AuthInstance.initModal();
+          await this.web3AuthInstance.initModal({
+            modalConfig: {
+              [WALLET_ADAPTERS.OPENLOGIN]: this.openLoginModalConfig,
+            },
+          });
         } else if (this.loginParams) {
           await this.web3AuthInstance.init();
         } else {
