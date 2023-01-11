@@ -9,10 +9,9 @@
 
 Web3Auth is where passwordless auth meets non-custodial key infrastructure for Web3 apps and wallets. By aggregating OAuth (Google, Twitter, Discord) logins, different wallets and innovative Multi Party Computation (MPC) - Web3Auth provides a seamless login experience to every user on your application.
 
-`@web3auth/web3auth-wagmi-connector` is a connector for the popular [wagmi](https://github.com/tmm/wagmi) library built on top of [Web3Auth Web SDKs
-](https://github.com/web3auth/web3auth-web).
+`@web3auth/web3auth-wagmi-connector` is a connector for the popular [wagmi](https://github.com/tmm/wagmi) library and Web3Auth Web SDKs. 
 
-It can be used to initialize a [wagmi client](https://wagmi.sh/docs/client) that will seemlessly manage the interaction of your DApp with Web3Auth.
+You can utilise this connector package alongside the Web3Auth Web SDKs to  initialize a [wagmi client](https://wagmi.sh/docs/client) that will seemlessly manage the interaction of your DApp with Web3Auth.
 
 ## 📖 Documentation
 
@@ -61,15 +60,16 @@ Here is an example of a wagmi client using both the `Web3AuthConnector` and the 
 ```js
 import { Web3AuthConnector } from '@web3auth/web3auth-wagmi-connector';
 import { Web3Auth } from "@web3auth/modal";
-import { chain, configureChains, createClient } from 'wagmi';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { publicProvider } from 'wagmi/providers/public';
+import { createClient, WagmiConfig, configureChains } from "wagmi";
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { publicProvider } from 'wagmi/providers/public'
 
-const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon],
-  [publicProvider()]
-);
-
+// Configure chains & providers with the Alchemy provider.
+// Popular providers are Alchemy (alchemy.com), Infura (infura.io), Quicknode (quicknode.com) etc.
+const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet],
+  [alchemyProvider({ apiKey: 'yourAlchemyApiKey' }), publicProvider()],
+)
 // Instantiating Web3Auth
 const web3AuthInstance = new Web3Auth({
     clientId: "YOUR_CLIENT_ID",
@@ -93,9 +93,16 @@ const wagmiClient = createClient({
         web3AuthInstance,
       },
     }),
-    new InjectedConnector({ chains }),
+    new InjectedConnector({
+      chains,
+      options: {
+        name: 'Injected',
+        shimDisconnect: true,
+      },
+    }),
   ],
   provider,
+  webSocketProvider,
 });
 ```
 
