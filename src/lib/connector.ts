@@ -13,9 +13,9 @@ const IS_SERVER = typeof window === "undefined";
 export class Web3AuthConnector extends Connector {
   ready = !IS_SERVER;
 
-  readonly id = "web3Auth";
+  readonly id = "web3auth";
 
-  readonly name = "web3Auth";
+  readonly name = "Web3Auth";
 
   provider: SafeEventEmitterProvider | null = null;
 
