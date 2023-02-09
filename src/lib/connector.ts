@@ -143,9 +143,9 @@ export class Web3AuthConnector extends Connector {
     try {
       const chain = this.chains.find((x) => x.id === chainId);
       if (!chain) throw new Error(`Unsupported chainId: ${chainId}`);
-      const provider = this.getProvider();
+      const provider = await this.getProvider();
       if (!provider) throw new Error("Please login first");
-      this.provider.request({
+      await this.provider.request({
         method: "wallet_addEthereumChain",
         params: [
           {
