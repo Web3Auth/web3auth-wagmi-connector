@@ -2,7 +2,7 @@ import { Address, Chain, Connector, ConnectorData, normalizeChainId, UserRejecte
 import { ADAPTER_STATUS, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE, WALLET_ADAPTERS } from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
-import { ethers, Signer } from "ethers";
+import { providers, Signer } from "ethers";
 import { getAddress } from "ethers/lib/utils";
 import log from "loglevel";
 
@@ -92,7 +92,7 @@ export class Web3AuthConnector extends Connector {
   }
 
   async getAccount(): Promise<Address> {
-    const provider = new ethers.providers.Web3Provider(await this.getProvider());
+    const provider = new providers.Web3Provider(await this.getProvider());
     const signer = provider.getSigner();
     const account = await signer.getAddress();
     return account as Address;
@@ -107,7 +107,7 @@ export class Web3AuthConnector extends Connector {
   }
 
   async getSigner(): Promise<Signer> {
-    const provider = new ethers.providers.Web3Provider(await this.getProvider());
+    const provider = new providers.Web3Provider(await this.getProvider());
     const signer = provider.getSigner();
     return signer;
   }
