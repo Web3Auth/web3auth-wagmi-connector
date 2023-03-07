@@ -33,7 +33,8 @@ const client = createClient({
     new WalletConnectConnector({
       chains,
       options: {
-        qrcode: true,
+        projectId: '...',
+        showQrModal: true,
       },
     }),
     new InjectedConnector({
