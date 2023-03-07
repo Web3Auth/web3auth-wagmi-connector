@@ -21,6 +21,6 @@
     "@web3auth/openlogin-adapter": "^4.6.0",
     "@web3auth/torus-wallet-connector-plugin": "^4.6.0",
     "@web3auth/web3auth-wagmi-connector": "file:../../",
-    "wagmi": "^0.11.7"
+    "wagmi": "^0.12.1"
   }
 }

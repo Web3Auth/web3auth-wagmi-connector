@@ -19,7 +19,7 @@
     "pre-commit": "lint-staged --cwd ."
   },
   "dependencies": {
-    "@wagmi/core": "^0.9.7",
+    "@wagmi/core": "^0.10.1",
     "lodash-es": "^4.17.21",
     "loglevel": "^1.8.1"
   },
@@ -30,7 +30,7 @@
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
-    "@wagmi/core": "^0.9.7",
+    "@wagmi/core": "^0.10.1",
     "@web3auth/base": "^4.6.0",
     "@web3auth/core": "^4.6.0",
     "@web3auth/modal": "^4.6.2",
