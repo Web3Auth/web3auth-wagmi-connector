@@ -9,6 +9,14 @@
   "types": "dist/types/index.d.ts",
   "repository": "",
   "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/web3authWagmiConnector.esm.js",
+      "require": "./dist/web3authWagmiConnector.cjs.js"
+    }
+  },
   "keywords": [],
   "scripts": {
     "dev": "torus-scripts start",
