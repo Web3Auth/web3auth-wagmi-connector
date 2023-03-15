@@ -1,0 +1,16 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "eslint.workingDirectories": [
+    {
+      "directory": "*",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "demos/*/*",
+      "changeProcessCWD": true
+    }
+  ],
+  "cSpell.words": ["openlogin", "tkey"]
+}
