@@ -67,10 +67,10 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "@web3auth/base": "^4.x",
-    "@web3auth/core": "^4.x",
-    "@web3auth/modal": "^4.x",
-    "@web3auth/openlogin-adapter": "^4.x",
+    "@web3auth/base": "^5.x",
+    "@web3auth/no-modal": "^5.x",
+    "@web3auth/modal": "^5.x",
+    "@web3auth/openlogin-adapter": "^5.x",
     "ethers": "^5.x"
   },
   "peerDependenciesMeta": {
