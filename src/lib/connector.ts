@@ -1,6 +1,6 @@
 import { Address, Connector, ConnectorData, normalizeChainId, UserRejectedRequestError } from "@wagmi/core";
 import { Chain } from "@wagmi/core/chains";
-import { ADAPTER_STATUS, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE, WALLET_ADAPTERS } from "@web3auth/base";
+import { ADAPTER_STATUS, CHAIN_NAMESPACES, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE, WALLET_ADAPTERS } from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import { providers, Signer } from "ethers";
@@ -10,6 +10,10 @@ import log from "loglevel";
 import type { Options } from "./interfaces";
 
 const IS_SERVER = typeof window === "undefined";
+
+function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModal {
+  return typeof (obj as IWeb3AuthModal).initModal !== "undefined";
+}
 
 export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Options, Signer> {
   ready = !IS_SERVER;
@@ -37,10 +41,6 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
   }
 
   async connect(): Promise<Required<ConnectorData>> {
-    function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModal {
-      return typeof (obj as IWeb3AuthModal).initModal !== "undefined";
-    }
-
     try {
       this.emit("message", {
         type: "connecting",
@@ -146,28 +146,17 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
       if (!chain) throw new Error(`Unsupported chainId: ${chainId}`);
       const provider = await this.getProvider();
       if (!provider) throw new Error("Please login first");
-      await this.provider.request({
-        method: "wallet_addEthereumChain",
-        params: [
-          {
-            chainId: `0x${chain.id.toString(16)}`,
-            chainName: chain.name,
-            rpcUrls: [chain.rpcUrls.default.http],
-            blockExplorerUrls: [chain.blockExplorers?.default?.url],
-            nativeCurrency: {
-              symbol: chain.nativeCurrency?.symbol || "ETH",
-            },
-          },
-        ],
+      await this.web3AuthInstance.addChain({
+        chainNamespace: CHAIN_NAMESPACES.EIP155,
+        chainId: `0x${chain.id.toString(16)}`,
+        rpcTarget: chain.rpcUrls.default.http[0],
+        displayName: chain.name,
+        blockExplorer: chain.blockExplorers?.default?.url,
+        ticker: chain.nativeCurrency?.symbol || "ETH",
+        tickerName: chain.nativeCurrency?.name || "Ethereum",
+        decimals: chain.nativeCurrency.decimals || 18,
       });
-      await this.provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [
-          {
-            chainId: `0x${chain.id.toString(16)}`,
-          },
-        ],
-      });
+      await this.web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
       return chain;
     } catch (error) {
       log.error("Error: Cannot change chain", error);
