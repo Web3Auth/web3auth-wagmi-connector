@@ -1,17 +1,19 @@
 // WAGMI Libraries
-import { WagmiConfig, createClient, configureChains } from "wagmi";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { WagmiConfig, createClient, configureChains, useAccount, useConnect, useDisconnect } from "wagmi";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { arbitrum, mainnet, polygon } from "wagmi/chains";
+import { mainnet, goerli, polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
-
+import { SendTransaction } from "./sendTransaction";
+import { NetworkSwitcher } from "./switchNetwork";
 import "./App.css";
 import Web3AuthConnectorInstance from "./Web3AuthConnectorInstance";
+import { Balance } from "./balance";
+import { WriteContract } from "./writeContract";
 
 // Configure chains & providers with the Public provider.
-const { chains, provider, webSocketProvider } = configureChains([mainnet, arbitrum, polygon], [publicProvider()]);
+const { chains, provider, webSocketProvider } = configureChains([goerli, mainnet, polygonMumbai ], [publicProvider()]);
 
 // Set up client
 const client = createClient({
@@ -43,9 +45,11 @@ const client = createClient({
   webSocketProvider,
 });
 
+
+
 function Profile() {
   const { address, connector, isConnected } = useAccount();
-  const { connect, connectors, error, isLoading, pendingConnector } = useConnect();
+  const { connect, connectors, error } = useConnect();
   const { disconnect } = useDisconnect();
 
   if (isConnected) {
@@ -56,6 +60,10 @@ function Profile() {
         <button className="card" onClick={disconnect as any}>
           Disconnect
         </button>
+        <SendTransaction />
+        <Balance />
+        <WriteContract />
+        <NetworkSwitcher />
       </div>
     );
   } else {
