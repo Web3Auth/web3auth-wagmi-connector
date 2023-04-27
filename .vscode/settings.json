@@ -12,5 +12,9 @@
       "changeProcessCWD": true
     }
   ],
-  "cSpell.words": ["openlogin", "tkey"]
+  "cSpell.words": [
+    "openlogin",
+    "tkey"
+  ],
+  "vue.codeActions.enabled": false
 }

@@ -104,5 +104,4 @@ dist
 
 .env.test
 .DS_Store
-demos/**/package-lock.json
 build/
