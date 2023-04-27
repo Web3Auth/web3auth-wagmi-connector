@@ -1,6 +1,7 @@
 import { Address, Connector, ConnectorData, normalizeChainId, UserRejectedRequestError } from "@wagmi/core";
 import type { Chain } from "@wagmi/core/chains";
-import { ADAPTER_STATUS, CHAIN_NAMESPACES, IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE, WALLET_ADAPTERS } from "@web3auth/base";
+import type { IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE } from "@web3auth/base";
+import * as pkg from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import { providers, Signer } from "ethers";
@@ -9,6 +10,7 @@ import log from "loglevel";
 import type { Options } from "./interfaces";
 
 const IS_SERVER = typeof window === "undefined";
+const { ADAPTER_STATUS, CHAIN_NAMESPACES, WALLET_ADAPTERS } = pkg;
 
 function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModal {
   return typeof (obj as IWeb3AuthModal).initModal !== "undefined";
