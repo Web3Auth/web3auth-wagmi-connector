@@ -1,11 +1,12 @@
-import { Address, Connector, ConnectorData, normalizeChainId, UserRejectedRequestError } from "@wagmi/core";
+/* eslint-disable import/no-extraneous-dependencies */
+import { Address, Connector, ConnectorData } from "@wagmi/core";
 import type { Chain } from "@wagmi/core/chains";
 import type { IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE } from "@web3auth/base";
 import * as pkg from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
-import { providers, Signer } from "ethers";
 import log from "loglevel";
+import { createWalletClient, custom, UserRejectedRequestError, WalletClient } from "viem";
 
 import type { Options } from "./interfaces";
 
@@ -16,7 +17,13 @@ function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModa
   return typeof (obj as IWeb3AuthModal).initModal !== "undefined";
 }
 
-export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Options, Signer> {
+function normalizeChainId(chainId: string | number | bigint) {
+  if (typeof chainId === "string") return Number.parseInt(chainId, chainId.trim().substring(0, 2) === "0x" ? 16 : 10);
+  if (typeof chainId === "bigint") return Number(chainId);
+  return chainId;
+}
+
+export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Options> {
   ready = !IS_SERVER;
 
   readonly id = "web3auth";
@@ -47,36 +54,22 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
         type: "connecting",
       });
 
-      if (this.web3AuthInstance.status === ADAPTER_STATUS.NOT_READY) {
+      await this.getProvider();
+
+      if (!this.web3AuthInstance.connected) {
         if (isIWeb3AuthModal(this.web3AuthInstance)) {
-          await this.web3AuthInstance.initModal({
-            modalConfig: this.modalConfig,
-          });
+          this.provider = await this.web3AuthInstance.connect();
         } else if (this.loginParams) {
-          await this.web3AuthInstance.init();
+          this.provider = await this.web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, this.loginParams);
         } else {
-          log.error("please provide a valid loginParams when not using @web3auth/modal");
-          throw new UserRejectedRequestError("please provide a valid loginParams when not using @web3auth/modal");
+          log.error("please provide valid loginParams when using @web3auth/no-modal");
+          throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
         }
       }
 
-      let { provider } = this.web3AuthInstance;
-
-      if (!provider) {
-        if (isIWeb3AuthModal(this.web3AuthInstance)) {
-          provider = await this.web3AuthInstance.connect();
-        } else if (this.loginParams) {
-          provider = await this.web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, this.loginParams);
-        } else {
-          log.error("please provide a valid loginParams when not using @web3auth/modal");
-          throw new UserRejectedRequestError("please provide a valid loginParams when not using @web3auth/modal");
-        }
-      }
-
-      const signer = await this.getSigner();
-      const account = (await signer.getAddress()) as Address;
-      provider.on("accountsChanged", this.onAccountsChanged.bind(this));
-      provider.on("chainChanged", this.onChainChanged.bind(this));
+      const account = await this.getAccount();
+      this.provider.on("accountsChanged", this.onAccountsChanged.bind(this));
+      this.provider.on("chainChanged", this.onChainChanged.bind(this));
       const chainId = await this.getChainId();
       const unsupported = this.isChainUnsupported(chainId);
       return {
@@ -85,33 +78,52 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
           id: chainId,
           unsupported,
         },
-        provider,
       };
     } catch (error) {
       log.error("error while connecting", error);
-      throw new UserRejectedRequestError("Something went wrong");
+      this.emit("disconnect");
+      throw new UserRejectedRequestError("Something went wrong" as unknown as Error);
     }
   }
 
+  async getWalletClient({ chainId }: { chainId?: number } = {}): Promise<WalletClient> {
+    const [provider, account] = await Promise.all([this.getProvider(), this.getAccount()]);
+    const chain = this.chains.find((x) => x.id === chainId);
+    if (!provider) throw new Error("provider is required.");
+    return createWalletClient({
+      account,
+      chain,
+      transport: custom(provider),
+    });
+  }
+
   async getAccount(): Promise<Address> {
-    const provider = new providers.Web3Provider(await this.getProvider());
-    const signer = provider.getSigner();
-    const account = await signer.getAddress();
-    return account as Address;
+    const provider = await this.getProvider();
+    const accounts = await provider.request<Address[]>({
+      method: "eth_accounts",
+    });
+    return accounts[0] as Address;
   }
 
   async getProvider() {
     if (this.provider) {
       return this.provider;
     }
+    if (this.web3AuthInstance.status === ADAPTER_STATUS.NOT_READY) {
+      if (isIWeb3AuthModal(this.web3AuthInstance)) {
+        await this.web3AuthInstance.initModal({
+          modalConfig: this.modalConfig,
+        });
+      } else if (this.loginParams) {
+        await this.web3AuthInstance.init();
+      } else {
+        log.error("please provide valid loginParams when using @web3auth/no-modal");
+        throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
+      }
+    }
+
     this.provider = this.web3AuthInstance.provider;
     return this.provider;
-  }
-
-  async getSigner(): Promise<Signer> {
-    const provider = new providers.Web3Provider(await this.getProvider());
-    const signer = provider.getSigner();
-    return signer;
   }
 
   async isAuthorized() {
