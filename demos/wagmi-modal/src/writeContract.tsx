@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useContractWrite, usePrepareContractWrite } from 'wagmi'
-import contractABI from './abi.json';
 
 
 export const WriteContract = () => {
   const [message, setMessage] = useState<string>('')
 
+  //@ts-ignore
   const { config } = usePrepareContractWrite({
     address: '0xD65AF91Bbb4334711A598dFD293596E6dc2d8313',
     abi: [

@@ -1,5 +1,5 @@
 // WAGMI Libraries
-import { WagmiConfig, createClient, configureChains } from "wagmi";
+import { WagmiConfig, createConfig, configureChains } from "wagmi";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
@@ -11,10 +11,10 @@ import "./App.css";
 import Web3AuthConnectorInstance from "./Web3AuthConnectorInstance";
 
 // Configure chains & providers with the Public provider.
-const { chains, provider, webSocketProvider } = configureChains([mainnet, arbitrum, polygon], [publicProvider()]);
+const { chains, publicClient, webSocketPublicClient } = configureChains([mainnet, arbitrum, polygon], [publicProvider()]);
 
 // Set up client
-const client = createClient({
+const config = createConfig({
   autoConnect: true,
   connectors: [
     new CoinbaseWalletConnector({
@@ -37,10 +37,10 @@ const client = createClient({
         shimDisconnect: true,
       },
     }),
-    Web3AuthConnectorInstance(chains),
+    Web3AuthConnectorInstance(chains) as any,
   ],
-  provider,
-  webSocketProvider,
+  publicClient,
+  webSocketPublicClient,
 });
 
 function Profile() {
@@ -77,7 +77,7 @@ function Profile() {
 // Pass client to React Context Provider
 function App() {
   return (
-    <WagmiConfig client={client}>
+    <WagmiConfig config={config}>
       <div className="container">
         <Profile />
       </div>
