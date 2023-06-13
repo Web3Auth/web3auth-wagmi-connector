@@ -1,5 +1,5 @@
 {
-  "name": "demo-auth0",
+  "name": "rainbowkit-auth0-react-no-modal-example",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,12 +12,15 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "wagmi": "1.0.7",
-    "@web3auth/base": "^6.0.4-alpha.0",
-    "@web3auth/ethereum-provider": "^6.0.4-alpha.0",
-    "@web3auth/no-modal": "^6.0.4-alpha.0",
-    "@web3auth/openlogin-adapter": "^6.0.4-alpha.0",
+    "@web3auth/base": "^6.0.0",
+    "@web3auth/ethereum-provider": "^6.0.0",
+    "@web3auth/no-modal": "^6.0.0",
+    "@web3auth/openlogin-adapter": "^6.0.0",
     "@web3auth/web3auth-wagmi-connector": "../../",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
     "buffer": "^6.0.3",

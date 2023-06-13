@@ -1,12 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Address, Connector, ConnectorData } from "@wagmi/core";
+import { Address, Connector, ConnectorData, WalletClient } from "@wagmi/core";
 import type { Chain } from "@wagmi/core/chains";
 import type { IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE } from "@web3auth/base";
 import * as pkg from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import log from "loglevel";
-import { createWalletClient, custom, UserRejectedRequestError, WalletClient } from "viem";
+import { createWalletClient, custom, UserRejectedRequestError } from "viem";
 
 import type { Options } from "./interfaces";
 

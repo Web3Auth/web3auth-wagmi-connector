@@ -37,7 +37,7 @@ const config = createConfig({
         shimDisconnect: true,
       },
     }),
-    Web3AuthConnectorInstance(chains) as any,
+    Web3AuthConnectorInstance(chains),
   ],
   publicClient,
   webSocketPublicClient,

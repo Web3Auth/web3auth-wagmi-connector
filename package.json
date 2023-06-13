@@ -36,10 +36,10 @@
     "@typescript-eslint/eslint-plugin": "^5.59.9",
     "@typescript-eslint/parser": "^5.59.9",
     "@wagmi/core": "^1.0.1",
-    "@web3auth/base": "^6.0.4-alpha.0",
-    "@web3auth/modal": "^6.0.4-alpha.0",
-    "@web3auth/no-modal": "^6.0.4-alpha.0",
-    "@web3auth/openlogin-adapter": "^6.0.4-alpha.0",
+    "@web3auth/base": "^6.0.0",
+    "@web3auth/modal": "^6.0.0",
+    "@web3auth/no-modal": "^6.0.0",
+    "@web3auth/openlogin-adapter": "^6.0.0",
     "changeset": "^0.2.6",
     "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
@@ -65,10 +65,10 @@
   },
   "peerDependencies": {
     "@wagmi/core": "^1.x",
-    "@web3auth/base": "^6.0.4-alpha.0",
-    "@web3auth/modal": "^6.0.4-alpha.0",
-    "@web3auth/no-modal": "^6.0.4-alpha.0",
-    "@web3auth/openlogin-adapter": "^6.0.4-alpha.0"
+    "@web3auth/base": "^6.x",
+    "@web3auth/modal": "^6.x",
+    "@web3auth/no-modal": "^6.x",
+    "@web3auth/openlogin-adapter": "^6.x"
   },
   "peerDependenciesMeta": {
     "@web3auth/modal": {

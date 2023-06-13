@@ -1,5 +1,5 @@
 {
-  "name": "demo-with-plugin",
+  "name": "rainbowkit-react-modal-plugin-example",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,11 +13,14 @@
     "viem": "^0.3.50",
     "wagmi": "1.0.1",
     "@web3auth/web3auth-wagmi-connector": "../../",
-    "@web3auth/modal": "^6.0.4-alpha.0",
-    "@web3auth/openlogin-adapter": "^6.0.4-alpha.0",
-    "@web3auth/base": "^6.0.4-alpha.0",
-    "@web3auth/torus-wallet-connector-plugin": "^6.0.4-alpha.0",
+    "@web3auth/modal": "^6.0.0",
+    "@web3auth/openlogin-adapter": "^6.0.0",
+    "@web3auth/base": "^6.0.0",
+    "@web3auth/torus-wallet-connector-plugin": "^6.0.0",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
     "buffer": "^6.0.3",
