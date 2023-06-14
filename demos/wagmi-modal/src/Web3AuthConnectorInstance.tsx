@@ -54,27 +54,27 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
   });
   web3AuthInstance.configureAdapter(openloginAdapterInstance);
 
-  // Add Torus Wallet Plugin (optional)
-  const torusPlugin = new TorusWalletConnectorPlugin({
-    torusWalletOpts: {
-      buttonPosition: "bottom-left",
-    },
-    walletInitOptions: {
-      whiteLabel: {
-        theme: {
-          isDark: false,
-          colors: {
-            primary: "#00a8ff",
-          },
-        },
-        logoDark: iconUrl,
-        logoLight: iconUrl,
-      },
-      useWalletConnect: true,
-      enableLogging: true,
-    },
-  });
-  web3AuthInstance.addPlugin(torusPlugin);
+  // // Add Torus Wallet Plugin (optional)
+  // const torusPlugin = new TorusWalletConnectorPlugin({
+  //   torusWalletOpts: {
+  //     buttonPosition: "bottom-left",
+  //   },
+  //   walletInitOptions: {
+  //     whiteLabel: {
+  //       theme: {
+  //         isDark: false,
+  //         colors: {
+  //           primary: "#00a8ff",
+  //         },
+  //       },
+  //       logoDark: iconUrl,
+  //       logoLight: iconUrl,
+  //     },
+  //     useWalletConnect: true,
+  //     enableLogging: true,
+  //   },
+  // });
+  // web3AuthInstance.addPlugin(torusPlugin);
 
   return new Web3AuthConnector({
     chains: chains as any,

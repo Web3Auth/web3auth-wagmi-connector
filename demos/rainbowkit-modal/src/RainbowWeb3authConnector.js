@@ -31,6 +31,7 @@ export const rainbowWeb3AuthConnector = ({ chains }) => {
       appName: name,
     },
     web3AuthNetwork: "cyan",
+    enableLogging: true,
   });
 
   // Add openlogin adapter for customisations

@@ -16,7 +16,7 @@
     "@web3auth/ethereum-provider": "^6.0.0",
     "@web3auth/no-modal": "^6.0.0",
     "@web3auth/openlogin-adapter": "^6.0.0",
-    "@web3auth/web3auth-wagmi-connector": "../../",
+    "@web3auth/web3auth-wagmi-connector": "file:../../",
     "web-vitals": "^2.1.4"
   },
   "overrides": {

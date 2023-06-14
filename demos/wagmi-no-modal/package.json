@@ -15,7 +15,7 @@
     "@web3auth/no-modal": "^6.0.0",
     "@web3auth/openlogin-adapter": "^6.0.0",
     "@web3auth/torus-wallet-connector-plugin": "^6.0.0",
-    "@web3auth/web3auth-wagmi-connector": "../../",
+    "@web3auth/web3auth-wagmi-connector": "file:../../",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",

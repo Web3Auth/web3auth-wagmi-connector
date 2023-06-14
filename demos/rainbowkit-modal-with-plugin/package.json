@@ -12,7 +12,7 @@
     "react-scripts": "5.0.1",
     "viem": "^0.3.50",
     "wagmi": "1.0.1",
-    "@web3auth/web3auth-wagmi-connector": "../../",
+    "@web3auth/web3auth-wagmi-connector": "file:../../",
     "@web3auth/modal": "^6.0.0",
     "@web3auth/openlogin-adapter": "^6.0.0",
     "@web3auth/base": "^6.0.0",
