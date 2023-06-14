@@ -6,7 +6,7 @@
   "unpkg": "dist/web3authWagmiConnector.umd.min.js",
   "jsdelivr": "dist/web3authWagmiConnector.umd.min.js",
   "types": "dist/types/index.d.ts",
-  "repository": "",
+  "repository": "https://github.com/Web3Auth/web3auth-wagmi-connector",
   "license": "MIT",
   "type": "module",
   "exports": {
