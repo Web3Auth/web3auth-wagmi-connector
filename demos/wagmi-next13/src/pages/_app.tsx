@@ -1,3 +1,4 @@
+import '@/styles/globals.css'
 // WAGMI Libraries
 import { WagmiConfig, createConfig, configureChains } from "wagmi";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
@@ -7,7 +8,6 @@ import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
-import "../styles/app.css";
 import Web3AuthConnectorInstance from "./_Web3AuthConnectorInstance";
 
 // Configure chains & providers with the Public provider.

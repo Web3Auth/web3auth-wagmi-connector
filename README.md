@@ -34,9 +34,9 @@ Checkout the official [Web3Auth Documentation](https://web3auth.io/docs) and [SD
 
 For using Web3Auth in the web, you have two choices of SDKs to get started with.
 
-[Web3Auth Plug and Play Modal SDK `@web3auth/modal`](https://web3auth.io/docs/sdk/web/web3auth/): A simple and easy to use SDK that will give you a simple modular way of implementing Web3Auth directly within your application. You can use the pre-configured Web3Auth Modal UI and whitelabel it according to your needs.
+[Web3Auth Plug and Play Modal SDK `@web3auth/modal`](https://web3auth.io/docs/sdk/web/modal/): A simple and easy to use SDK that will give you a simple modular way of implementing Web3Auth directly within your application. You can use the pre-configured Web3Auth Modal UI and whitelabel it according to your needs.
 
-[Web3Auth Plug and Play Core SDK `@web3auth/core`](https://web3auth.io/docs/sdk/web/core/): The core module implemeting all the Web3Auth features you need and giving you the flexibilty of using your own UI with the Web3Auth SDK working in the backend.
+[Web3Auth Plug and Play No Modal SDK `@web3auth/no-modal`](https://web3auth.io/docs/sdk/web/no-modal/): The core module implemeting all the Web3Auth features you need and giving you the flexibilty of using your own UI with the Web3Auth SDK working in the client side.
 
 ## ⚡ Quick Start
 
@@ -58,57 +58,56 @@ Hop on to the [Web3Auth Dashboard](https://dashboard.web3auth.io/) and create a 
 Here is an example of a wagmi client using both the `Web3AuthConnector` and the default `InjectedConnector` respectively.
 
 ```js
-import { Web3AuthConnector } from '@web3auth/web3auth-wagmi-connector';
+import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 import { Web3Auth } from "@web3auth/modal";
-import { createClient, WagmiConfig, configureChains } from "wagmi";
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { publicProvider } from 'wagmi/providers/public'
+import { createConfig, WagmiConfig, configureChains } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { publicProvider } from "wagmi/providers/public";
 
 // Configure chains & providers with the Alchemy provider.
 // Popular providers are Alchemy (alchemy.com), Infura (infura.io), Quicknode (quicknode.com) etc.
-const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet],
-  [alchemyProvider({ apiKey: 'yourAlchemyApiKey' }), publicProvider()],
-)
+const { chains, publicClient, webSocketPublicClient } = configureChains([mainnet, arbitrum, polygon], [publicProvider()]);
+
 // Instantiating Web3Auth
 const web3AuthInstance = new Web3Auth({
-    clientId: "YOUR_CLIENT_ID",
-    chainConfig: {
-      chainNamespace: CHAIN_NAMESPACES.EIP155,
-      chainId: "0x"+chains[0].id.toString(16),
-      rpcTarget: chains[0].rpcUrls.default, // This is the public RPC we have added, please pass on your own endpoint while creating an app
-      displayName: chains[0].name,
-      tickerName: chains[0].nativeCurrency?.name,
-      ticker: chains[0].nativeCurrency?.symbol,
-      blockExplorer: chains[0]?.blockExplorers.default?.url,
-    },
-  });
+  clientId: "YOUR_CLIENT_ID",
+  chainConfig: {
+    chainNamespace: CHAIN_NAMESPACES.EIP155,
+    chainId: "0x" + chains[0].id.toString(16),
+    rpcTarget: chains[0].rpcUrls.default, // This is the public RPC we have added, please pass on your own endpoint while creating an app
+    displayName: chains[0].name,
+    tickerName: chains[0].nativeCurrency?.name,
+    ticker: chains[0].nativeCurrency?.symbol,
+    blockExplorer: chains[0]?.blockExplorers.default?.url,
+  },
+  web3AuthNetwork: "cyan",
+});
 
-const wagmiClient = createClient({
+const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
-    new Web3AuthConnector({ 
+    new Web3AuthConnector({
       chains,
-      options: { 
+      options: {
         web3AuthInstance,
       },
     }),
     new InjectedConnector({
       chains,
       options: {
-        name: 'Injected',
+        name: "Injected",
         shimDisconnect: true,
       },
     }),
   ],
-  provider,
-  webSocketProvider,
+  publicClient,
+  webSocketPublicClient,
 });
 ```
 
 ## 🩹 Examples
 
-Checkout the examples for your preferred blockchain and platform in our [examples repository](https://github.com/Web3Auth/examples/)
+Checkout the examples for your preferred blockchain and platform in our [examples repository](https://github.com/Web3Auth/web3auth-pnp-examples/)
 
 ## 🌐 Demo
 
