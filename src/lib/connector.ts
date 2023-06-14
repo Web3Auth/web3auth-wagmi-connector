@@ -51,6 +51,9 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
 
       await this.getProvider();
 
+      this.provider.on("accountsChanged", this.onAccountsChanged.bind(this));
+      this.provider.on("chainChanged", this.onChainChanged.bind(this));
+
       if (!this.web3AuthInstance.connected) {
         if (isIWeb3AuthModal(this.web3AuthInstance)) {
           await this.web3AuthInstance.connect();
@@ -61,9 +64,6 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
           throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
         }
       }
-
-      this.provider.on("accountsChanged", this.onAccountsChanged.bind(this));
-      this.provider.on("chainChanged", this.onChainChanged.bind(this));
 
       const [account, connectedChainId] = await Promise.all([this.getAccount(), this.getChainId()]);
       let unsupported = this.isChainUnsupported(connectedChainId);
@@ -138,9 +138,9 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
   }
 
   async getChainId(): Promise<number> {
-    this.getProvider();
+    await this.getProvider();
     const chainId = await this.provider.request<string>({ method: "eth_chainId" });
-    log.log("chainId", chainId);
+    log.info("chainId", chainId);
     return normalizeChainId(chainId);
   }
 
@@ -159,9 +159,9 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
         tickerName: chain.nativeCurrency?.name || "Ethereum",
         decimals: chain.nativeCurrency.decimals || 18,
       });
-      log.log("Chain Added: ", chain.name);
+      log.info("Chain Added: ", chain.name);
       await this.web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
-      log.log("Chain Switched to ", chain.name);
+      log.info("Chain Switched to ", chain.name);
       return chain;
     } catch (error) {
       log.error("Error: Cannot change chain", error);
@@ -188,7 +188,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
   protected onChainChanged(chainId: string | number): void {
     const id = normalizeChainId(chainId);
     const unsupported = this.isChainUnsupported(id);
-    log.log("chainChanged", id, unsupported);
+    log.info("chainChanged", id, unsupported);
     this.emit("change", { chain: { id, unsupported } });
   }
 
