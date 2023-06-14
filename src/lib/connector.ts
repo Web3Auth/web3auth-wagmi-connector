@@ -49,9 +49,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
         type: "connecting",
       });
 
-      this.provider = await this.getProvider();
-      this.provider.on("accountsChanged", this.onAccountsChanged.bind(this));
-      this.provider.on("chainChanged", this.onChainChanged.bind(this));
+      await this.getProvider();
 
       if (!this.web3AuthInstance.connected) {
         if (isIWeb3AuthModal(this.web3AuthInstance)) {
@@ -64,10 +62,13 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
         }
       }
 
+      this.provider.on("accountsChanged", this.onAccountsChanged.bind(this));
+      this.provider.on("chainChanged", this.onChainChanged.bind(this));
+
       const [account, connectedChainId] = await Promise.all([this.getAccount(), this.getChainId()]);
-      let unsupported = this.isChainUnsupported(chainId);
+      let unsupported = this.isChainUnsupported(connectedChainId);
       let id = connectedChainId;
-      if (chainId && chainId !== connectedChainId) {
+      if (chainId && connectedChainId !== chainId) {
         // try switching chain
         const chain = await this.switchChain(chainId);
         id = chain.id;
@@ -137,25 +138,30 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
   }
 
   async getChainId(): Promise<number> {
+    this.getProvider();
     const chainId = await this.provider.request<string>({ method: "eth_chainId" });
+    log.log("chainId", chainId);
     return normalizeChainId(chainId);
   }
 
   async switchChain(chainId: number) {
     try {
       const chain = this.chains.find((x) => x.id === chainId);
-      if (!chain) throw new Error(`Unsupported chainId: ${chainId}`);
+      if (!chain) throw new SwitchChainError(new Error("chain not found on connector."));
+
       await this.web3AuthInstance.addChain({
         chainNamespace: CHAIN_NAMESPACES.EIP155,
         chainId: `0x${chain.id.toString(16)}`,
         rpcTarget: chain.rpcUrls.default.http[0],
         displayName: chain.name,
-        blockExplorer: chain.blockExplorers?.default?.url,
+        blockExplorer: chain.blockExplorers?.default.url[0] || "",
         ticker: chain.nativeCurrency?.symbol || "ETH",
         tickerName: chain.nativeCurrency?.name || "Ethereum",
         decimals: chain.nativeCurrency.decimals || 18,
       });
+      log.log("Chain Added: ", chain.name);
       await this.web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
+      log.log("Chain Switched to ", chain.name);
       return chain;
     } catch (error) {
       log.error("Error: Cannot change chain", error);
@@ -182,6 +188,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
   protected onChainChanged(chainId: string | number): void {
     const id = normalizeChainId(chainId);
     const unsupported = this.isChainUnsupported(id);
+    log.log("chainChanged", id, unsupported);
     this.emit("change", { chain: { id, unsupported } });
   }
 
