@@ -51,8 +51,8 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
 
       await this.getProvider();
 
-      this.provider.on("accountsChanged", this.onAccountsChanged.bind(this));
-      this.provider.on("chainChanged", this.onChainChanged.bind(this));
+      this.provider.on("accountsChanged", this.onAccountsChanged);
+      this.provider.on("chainChanged", this.onChainChanged);
 
       if (!this.web3AuthInstance.connected) {
         if (isIWeb3AuthModal(this.web3AuthInstance)) {
@@ -176,21 +176,21 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
     provider.removeListener("chainChanged", this.onChainChanged);
   }
 
-  protected onAccountsChanged(accounts: string[]): void {
+  protected onAccountsChanged = (accounts: string[]): void => {
     if (accounts.length === 0) this.emit("disconnect");
     else this.emit("change", { account: getAddress(accounts[0]) });
-  }
+  };
 
   protected isChainUnsupported(chainId: number): boolean {
     return !this.chains.some((x) => x.id === chainId);
   }
 
-  protected onChainChanged(chainId: string | number): void {
+  protected onChainChanged = (chainId: string | number): void => {
     const id = normalizeChainId(chainId);
     const unsupported = this.isChainUnsupported(id);
     log.info("chainChanged", id, unsupported);
     this.emit("change", { chain: { id, unsupported } });
-  }
+  };
 
   protected onDisconnect(): void {
     this.emit("disconnect");
