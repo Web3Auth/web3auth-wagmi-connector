@@ -1,7 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Address, Chain, Connector, ConnectorData, WalletClient } from "@wagmi/core";
-import type { IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE } from "@web3auth/base";
-import * as pkg from "@web3auth/base";
+import {
+  ADAPTER_STATUS,
+  CHAIN_NAMESPACES,
+  type IWeb3Auth,
+  log,
+  type SafeEventEmitterProvider,
+  type WALLET_ADAPTER_TYPE,
+  WALLET_ADAPTERS,
+} from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import { createWalletClient, custom, getAddress, SwitchChainError, UserRejectedRequestError } from "viem";
@@ -9,7 +16,6 @@ import { createWalletClient, custom, getAddress, SwitchChainError, UserRejectedR
 import type { Options } from "./interfaces";
 
 const IS_SERVER = typeof window === "undefined";
-const { ADAPTER_STATUS, CHAIN_NAMESPACES, WALLET_ADAPTERS, log } = pkg;
 
 function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModal {
   return typeof (obj as IWeb3AuthModal).initModal !== "undefined";
@@ -101,7 +107,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
 
   async getAccount(): Promise<Address> {
     const provider = await this.getProvider();
-    const accounts = await provider.request<string[]>({
+    const accounts = await provider.request<unknown, string[]>({
       method: "eth_accounts",
     });
     return getAddress(accounts[0]);
@@ -139,7 +145,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
 
   async getChainId(): Promise<number> {
     await this.getProvider();
-    const chainId = await this.provider.request<string>({ method: "eth_chainId" });
+    const chainId = await this.provider.request<unknown, string>({ method: "eth_chainId" });
     log.info("chainId", chainId);
     return normalizeChainId(chainId);
   }
@@ -163,9 +169,9 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
       await this.web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
       log.info("Chain Switched to ", chain.name);
       return chain;
-    } catch (error) {
+    } catch (error: unknown) {
       log.error("Error: Cannot change chain", error);
-      throw new SwitchChainError(error);
+      throw new SwitchChainError(error as Error);
     }
   }
 

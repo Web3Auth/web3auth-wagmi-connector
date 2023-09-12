@@ -1,5 +1,1 @@
-const defaultConfig = {
-  analyzerMode: "disabled",
-};
-
-module.exports = defaultConfig;
+module.exports = require("@toruslabs/config/tsconfig.default.json");
