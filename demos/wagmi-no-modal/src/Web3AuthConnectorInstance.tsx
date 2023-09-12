@@ -24,9 +24,9 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
   }
 
   const web3AuthInstance = new Web3AuthNoModal({
-    clientId: "YOUR_CLIENT_ID",
+    clientId: "openlogin",
     chainConfig,
-    web3AuthNetwork: "cyan",
+    web3AuthNetwork: "testnet",
   });
 
   const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
@@ -35,14 +35,14 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
   const openloginAdapterInstance = new OpenloginAdapter({
     privateKeyProvider,
     adapterSettings: {
-      network: "cyan",
+      network: "testnet",
       uxMode: "popup",
       whiteLabel: {
-        name,
+        appName: name,
         logoLight: iconUrl,
         logoDark: iconUrl,
         defaultLanguage: "en",
-        dark: true, // whether to enable dark mode. defaultValue: false
+        mode: "dark", // whether to enable dark mode. defaultValue: false
       },
     },
   });
