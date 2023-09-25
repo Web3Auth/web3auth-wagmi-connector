@@ -1,19 +1,13 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { Address, Chain, Connector, ConnectorData, WalletClient } from "@wagmi/core";
-import {
-  ADAPTER_STATUS,
-  CHAIN_NAMESPACES,
-  type IWeb3Auth,
-  log,
-  type SafeEventEmitterProvider,
-  type WALLET_ADAPTER_TYPE,
-  WALLET_ADAPTERS,
-} from "@web3auth/base";
+import type { IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE } from "@web3auth/base";
+import * as pkg from "@web3auth/base";
 import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
 import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
 import { createWalletClient, custom, getAddress, SwitchChainError, UserRejectedRequestError } from "viem";
 
 import type { Options } from "./interfaces";
+
+const { ADAPTER_STATUS, CHAIN_NAMESPACES, WALLET_ADAPTERS, log } = pkg;
 
 const IS_SERVER = typeof window === "undefined";
 
