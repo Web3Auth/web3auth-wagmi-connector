@@ -5,7 +5,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     sourceType: "module",
-    ecmaVersion: 20222,
+    ecmaVersion: 2022,
     project: "./tsconfig.json",
   },
   ignorePatterns: [".eslintrc.cjs", "*.config.ts"],
