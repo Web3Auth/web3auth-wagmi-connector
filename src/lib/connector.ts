@@ -101,7 +101,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
 
   async getAccount(): Promise<Address> {
     const provider = await this.getProvider();
-    const accounts = await provider.request<unknown, string[]>({
+    const accounts = await provider.request<string[]>({
       method: "eth_accounts",
     });
     return getAddress(accounts[0]);
@@ -139,7 +139,7 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
 
   async getChainId(): Promise<number> {
     await this.getProvider();
-    const chainId = await this.provider.request<unknown, string>({ method: "eth_chainId" });
+    const chainId = await this.provider.request<string>({ method: "eth_chainId" });
     log.info("chainId", chainId);
     return normalizeChainId(chainId);
   }
@@ -162,6 +162,10 @@ export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Optio
       log.info("Chain Added: ", chain.name);
       await this.web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
       log.info("Chain Switched to ", chain.name);
+      // Emit the change to wagmi
+      this.emit('change', {
+        chain
+      })
       return chain;
     } catch (error: unknown) {
       log.error("Error: Cannot change chain", error);
