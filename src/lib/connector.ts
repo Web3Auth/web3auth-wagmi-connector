@@ -1,198 +1,153 @@
-import { Address, Chain, Connector, ConnectorData, WalletClient } from "@wagmi/core";
-import type { IWeb3Auth, SafeEventEmitterProvider, WALLET_ADAPTER_TYPE } from "@web3auth/base";
+import { ChainNotConfiguredError, createConnector, normalizeChainId } from "@wagmi/core";
+import type { IWeb3Auth } from "@web3auth/base";
 import * as pkg from "@web3auth/base";
-import type { IWeb3AuthModal, ModalConfig } from "@web3auth/modal";
-import type { OpenloginLoginParams } from "@web3auth/openlogin-adapter";
-import { createWalletClient, custom, getAddress, SwitchChainError, UserRejectedRequestError } from "viem";
+import type { IWeb3AuthModal } from "@web3auth/modal";
+import { Chain, getAddress, SwitchChainError, UserRejectedRequestError } from "viem";
 
-import type { Options } from "./interfaces";
+import type { Provider, Web3AuthConnectorParams } from "./interfaces";
 
 const { ADAPTER_STATUS, CHAIN_NAMESPACES, WALLET_ADAPTERS, log } = pkg;
-
-const IS_SERVER = typeof window === "undefined";
 
 function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModal {
   return typeof (obj as IWeb3AuthModal).initModal !== "undefined";
 }
 
-function normalizeChainId(chainId: string | number | bigint) {
-  if (typeof chainId === "string") return Number.parseInt(chainId, chainId.trim().substring(0, 2) === "0x" ? 16 : 10);
-  if (typeof chainId === "bigint") return Number(chainId);
-  return chainId;
-}
+export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
+  let walletProvider: Provider | null = null;
 
-export class Web3AuthConnector extends Connector<SafeEventEmitterProvider, Options> {
-  ready = !IS_SERVER;
+  const { web3AuthInstance, loginParams, modalConfig } = parameters;
 
-  readonly id = "web3auth";
+  return createConnector<Provider>((config) => ({
+    id: "web3auth",
+    name: "Web3Auth",
+    type: "Web3Auth",
+    async connect({ chainId } = {}) {
+      try {
+        config.emitter.emit("message", {
+          type: "connecting",
+        });
+        const provider = await this.getProvider();
 
-  readonly name = "Web3Auth";
+        provider.on("accountsChanged", this.onAccountsChanged);
+        provider.on("chainChanged", this.onChainChanged);
+        provider.on("disconnect", this.onDisconnect.bind(this));
 
-  protected provider: SafeEventEmitterProvider | null = null;
+        if (!web3AuthInstance.connected) {
+          if (isIWeb3AuthModal(web3AuthInstance)) {
+            await web3AuthInstance.connect();
+          } else if (loginParams) {
+            await web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, loginParams);
+          } else {
+            log.error("please provide valid loginParams when using @web3auth/no-modal");
+            throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
+          }
+        }
 
-  private loginParams: OpenloginLoginParams | null;
+        let currentChainId = await this.getChainId();
+        if (chainId && currentChainId !== chainId) {
+          const chain = await this.switchChain!({ chainId }).catch((error) => {
+            if (error.code === UserRejectedRequestError.code) throw error;
+            return { id: currentChainId };
+          });
+          currentChainId = chain?.id ?? currentChainId;
+        }
 
-  private modalConfig: Record<WALLET_ADAPTER_TYPE, ModalConfig> | null;
+        const accounts = await this.getAccounts();
 
-  private web3AuthInstance: IWeb3Auth | IWeb3AuthModal;
-
-  constructor({ chains, options }: { chains?: Chain[]; options: Options }) {
-    super({ chains, options });
-    this.web3AuthInstance = options.web3AuthInstance;
-    this.loginParams = options.loginParams || null;
-    this.modalConfig = options.modalConfig || null;
-  }
-
-  async connect({ chainId }: { chainId?: number } = {}): Promise<Required<ConnectorData>> {
-    try {
-      this.emit("message", {
-        type: "connecting",
-      });
-
-      await this.getProvider();
-
-      this.provider.on("accountsChanged", this.onAccountsChanged);
-      this.provider.on("chainChanged", this.onChainChanged);
-
-      if (!this.web3AuthInstance.connected) {
-        if (isIWeb3AuthModal(this.web3AuthInstance)) {
-          await this.web3AuthInstance.connect();
-        } else if (this.loginParams) {
-          await this.web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, this.loginParams);
+        return { accounts, chainId: currentChainId };
+      } catch (error) {
+        log.error("error while connecting", error);
+        this.onDisconnect();
+        throw new UserRejectedRequestError("Something went wrong" as unknown as Error);
+      }
+    },
+    async getAccounts() {
+      const provider = await this.getProvider();
+      return (
+        await provider.request<unknown, string[]>({
+          method: "eth_accounts",
+        })
+      ).map((x: string) => getAddress(x));
+    },
+    async getChainId() {
+      const provider = await this.getProvider();
+      const chainId = await provider.request<unknown, number>({ method: "eth_chainId" });
+      return normalizeChainId(chainId);
+    },
+    async getProvider(): Promise<Provider> {
+      if (walletProvider) {
+        return walletProvider;
+      }
+      if (web3AuthInstance.status === ADAPTER_STATUS.NOT_READY) {
+        if (isIWeb3AuthModal(web3AuthInstance)) {
+          await web3AuthInstance.initModal({
+            modalConfig,
+          });
+        } else if (loginParams) {
+          await web3AuthInstance.init();
         } else {
           log.error("please provide valid loginParams when using @web3auth/no-modal");
           throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
         }
       }
 
-      const [account, connectedChainId] = await Promise.all([this.getAccount(), this.getChainId()]);
-      let unsupported = this.isChainUnsupported(connectedChainId);
-      let id = connectedChainId;
-      if (chainId && connectedChainId !== chainId) {
-        // try switching chain
-        const chain = await this.switchChain(chainId);
-        id = chain.id;
-        unsupported = this.isChainUnsupported(id);
+      walletProvider = web3AuthInstance.provider;
+      return walletProvider;
+    },
+    async isAuthorized() {
+      try {
+        const accounts = await this.getAccounts();
+        return !!accounts.length;
+      } catch {
+        return false;
       }
-      return {
-        account,
-        chain: {
-          id,
-          unsupported,
-        },
-      };
-    } catch (error) {
-      log.error("error while connecting", error);
-      this.onDisconnect();
-      throw new UserRejectedRequestError("Something went wrong" as unknown as Error);
-    }
-  }
+    },
+    async switchChain({ chainId }): Promise<Chain> {
+      try {
+        const chain = config.chains.find((x) => x.id === chainId);
+        if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
 
-  async getWalletClient({ chainId }: { chainId?: number } = {}): Promise<WalletClient> {
-    const [provider, account] = await Promise.all([this.getProvider(), this.getAccount()]);
-    const chain = this.chains.find((x) => x.id === chainId);
-    if (!provider) throw new Error("provider is required.");
-    return createWalletClient({
-      account,
-      chain,
-      transport: custom(provider),
-    });
-  }
-
-  async getAccount(): Promise<Address> {
-    const provider = await this.getProvider();
-    const accounts = await provider.request<unknown, string[]>({
-      method: "eth_accounts",
-    });
-    return getAddress(accounts[0]);
-  }
-
-  async getProvider() {
-    if (this.provider) {
-      return this.provider;
-    }
-    if (this.web3AuthInstance.status === ADAPTER_STATUS.NOT_READY) {
-      if (isIWeb3AuthModal(this.web3AuthInstance)) {
-        await this.web3AuthInstance.initModal({
-          modalConfig: this.modalConfig,
+        await web3AuthInstance.addChain({
+          chainNamespace: CHAIN_NAMESPACES.EIP155,
+          chainId: `0x${chain.id.toString(16)}`,
+          rpcTarget: chain.rpcUrls.default.http[0],
+          displayName: chain.name,
+          blockExplorer: chain.blockExplorers?.default.url[0] || "",
+          ticker: chain.nativeCurrency?.symbol || "ETH",
+          tickerName: chain.nativeCurrency?.name || "Ethereum",
+          decimals: chain.nativeCurrency.decimals || 18,
         });
-      } else if (this.loginParams) {
-        await this.web3AuthInstance.init();
-      } else {
-        log.error("please provide valid loginParams when using @web3auth/no-modal");
-        throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
+        log.info("Chain Added: ", chain.name);
+        await web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
+        log.info("Chain Switched to ", chain.name);
+        config.emitter.emit("change", {
+          chainId,
+        });
+        return chain;
+      } catch (error: unknown) {
+        log.error("Error: Cannot change chain", error);
+        throw new SwitchChainError(error as Error);
       }
-    }
-
-    this.provider = this.web3AuthInstance.provider;
-    return this.provider;
-  }
-
-  async isAuthorized() {
-    try {
-      const account = await this.getAccount();
-      return !!account;
-    } catch {
-      return false;
-    }
-  }
-
-  async getChainId(): Promise<number> {
-    await this.getProvider();
-    const chainId = await this.provider.request<unknown, string>({ method: "eth_chainId" });
-    log.info("chainId", chainId);
-    return normalizeChainId(chainId);
-  }
-
-  async switchChain(chainId: number) {
-    try {
-      const chain = this.chains.find((x) => x.id === chainId);
-      if (!chain) throw new SwitchChainError(new Error("chain not found on connector."));
-
-      await this.web3AuthInstance.addChain({
-        chainNamespace: CHAIN_NAMESPACES.EIP155,
-        chainId: `0x${chain.id.toString(16)}`,
-        rpcTarget: chain.rpcUrls.default.http[0],
-        displayName: chain.name,
-        blockExplorer: chain.blockExplorers?.default.url[0] || "",
-        ticker: chain.nativeCurrency?.symbol || "ETH",
-        tickerName: chain.nativeCurrency?.name || "Ethereum",
-        decimals: chain.nativeCurrency.decimals || 18,
-      });
-      log.info("Chain Added: ", chain.name);
-      await this.web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
-      log.info("Chain Switched to ", chain.name);
-      return chain;
-    } catch (error: unknown) {
-      log.error("Error: Cannot change chain", error);
-      throw new SwitchChainError(error as Error);
-    }
-  }
-
-  async disconnect(): Promise<void> {
-    await this.web3AuthInstance.logout();
-    const provider = await this.getProvider();
-    provider.removeListener("accountsChanged", this.onAccountsChanged);
-    provider.removeListener("chainChanged", this.onChainChanged);
-  }
-
-  protected onAccountsChanged = (accounts: string[]): void => {
-    if (accounts.length === 0) this.emit("disconnect");
-    else this.emit("change", { account: getAddress(accounts[0]) });
-  };
-
-  protected isChainUnsupported(chainId: number): boolean {
-    return !this.chains.some((x) => x.id === chainId);
-  }
-
-  protected onChainChanged = (chainId: string | number): void => {
-    const id = normalizeChainId(chainId);
-    const unsupported = this.isChainUnsupported(id);
-    log.info("chainChanged", id, unsupported);
-    this.emit("change", { chain: { id, unsupported } });
-  };
-
-  protected onDisconnect(): void {
-    this.emit("disconnect");
-  }
+    },
+    async disconnect(): Promise<void> {
+      await web3AuthInstance.logout();
+      const provider = await this.getProvider();
+      provider.removeListener("accountsChanged", this.onAccountsChanged);
+      provider.removeListener("chainChanged", this.onChainChanged);
+    },
+    onAccountsChanged(accounts) {
+      if (accounts.length === 0) config.emitter.emit("disconnect");
+      else
+        config.emitter.emit("change", {
+          accounts: accounts.map((x) => getAddress(x)),
+        });
+    },
+    onChainChanged(chain) {
+      const chainId = normalizeChainId(chain);
+      config.emitter.emit("change", { chainId });
+    },
+    onDisconnect(): void {
+      config.emitter.emit("disconnect");
+    },
+  }));
 }

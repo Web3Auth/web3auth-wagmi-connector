@@ -12,6 +12,7 @@ module.exports = {
   rules: {
     "@typescript-eslint/no-throw-literal": 0,
     "no-case-declarations": 0,
+    "require-atomic-updates": 0,
     "import/extensions": [
       "error",
       "ignorePackages",
