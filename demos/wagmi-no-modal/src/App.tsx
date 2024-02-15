@@ -1,6 +1,5 @@
 // WAGMI Libraries
-import { WagmiProvider, createConfig, http } from "wagmi";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { WagmiProvider, createConfig, http, useAccount, useConnect, useDisconnect } from "wagmi";
 import { coinbaseWallet, walletConnect } from "wagmi/connectors";
 import { sepolia, mainnet, polygon } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
@@ -21,7 +20,7 @@ const config = createConfig({
   connectors: [
     walletConnect({
       projectId: "3314f39613059cb687432d249f1658d2",
-      showQrModal: true,
+      showQrModal: true, 
     }),
     coinbaseWallet({ appName: 'wagmi' }),
     Web3AuthConnectorInstance([mainnet, sepolia, polygon]),
