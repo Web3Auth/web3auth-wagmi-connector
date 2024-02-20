@@ -1,0 +1,32 @@
+{
+  "name": "wagmi-next13-no-modal-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@types/node": "20.3.0",
+    "@types/react": "18.2.11",
+    "@types/react-dom": "18.2.4",
+    "eslint": "8.42.0",
+    "eslint-config-next": "13.4.5",
+    "next": "13.4.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "@web3auth/base": "^6.0.0",
+    "@web3auth/modal": "^6.0.0",
+    "@web3auth/ethereum-provider": "^6.0.0",
+    "@web3auth/openlogin-adapter": "^6.0.0",
+    "@web3auth/torus-wallet-connector-plugin": "^6.0.0",
+    "@web3auth/web3auth-wagmi-connector": "../../",
+    "typescript": "^4.9.5",
+    "wagmi": "^1.1.1"
+  },
+  "overrides": {
+    "typescript": "^4.9.5"
+  }
+}
