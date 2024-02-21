@@ -20,7 +20,7 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "viem": "^1.0.7",
-    "wagmi": "^1.2.0",
+    "wagmi": "^1.4.13",
     "web-vitals": "^2.1.4"
   },
   "overrides": {
