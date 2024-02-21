@@ -24,7 +24,7 @@
     "@web3auth/torus-wallet-connector-plugin": "^6.0.0",
     "@web3auth/web3auth-wagmi-connector": "../../",
     "typescript": "^4.9.5",
-    "wagmi": "^1.1.1"
+    "wagmi": "^1.4.13"
   },
   "overrides": {
     "typescript": "^4.9.5"
