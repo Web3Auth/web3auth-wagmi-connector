@@ -1,6 +1,6 @@
 import { useAccount, useBalance } from "wagmi";
 
-export function Balance() {
+export default function Balance() {
   const { address } = useAccount();
 
   const { data: default_ } = useBalance({ address });

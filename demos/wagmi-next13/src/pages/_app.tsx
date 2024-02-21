@@ -6,11 +6,11 @@ import { createConfig, http, useAccount, useConnect, useDisconnect, WagmiProvide
 import { mainnet, polygon, sepolia } from "wagmi/chains";
 import { coinbaseWallet, walletConnect } from "wagmi/connectors";
 
-import { Balance } from "./_balance";
-import { SendTransaction } from "./_sendTransaction";
-import { SwitchChain } from "./_switchNetwork";
+import Balance from "./_balance";
+import SendTransaction from "./_sendTransaction";
+import SwitchChain from "./_switchNetwork";
 import Web3AuthConnectorInstance from "./_Web3AuthConnectorInstance";
-import { WriteContract } from "./_writeContract";
+import WriteContract from "./_writeContract";
 
 const queryClient = new QueryClient();
 

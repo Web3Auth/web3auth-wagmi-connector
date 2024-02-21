@@ -2,7 +2,7 @@ import { FormEvent } from "react";
 import { Hex, parseEther } from "viem";
 import { BaseError, useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
 
-export function SendTransaction() {
+export default function SendTransaction() {
   const { data: hash, error, isPending, sendTransaction } = useSendTransaction();
 
   async function submit(e: FormEvent<HTMLFormElement>) {

@@ -1,6 +1,6 @@
 import { useChainId, useSwitchChain } from "wagmi";
 
-export function SwitchChain() {
+export default function SwitchChain() {
   const chainId = useChainId();
   const { chains, switchChain, error } = useSwitchChain();
 

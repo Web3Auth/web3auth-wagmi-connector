@@ -2,7 +2,7 @@ import { FormEvent } from "react";
 import { parseAbi } from "viem";
 import { BaseError, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
-export function WriteContract() {
+export default function WriteContract() {
   const { data: hash, error, isPending, writeContract } = useWriteContract();
 
   async function submit(e: FormEvent<HTMLFormElement>) {
