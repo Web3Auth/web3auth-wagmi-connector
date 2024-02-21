@@ -112,10 +112,13 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
           chainId: `0x${chain.id.toString(16)}`,
           rpcTarget: chain.rpcUrls.default.http[0],
           displayName: chain.name,
-          blockExplorer: chain.blockExplorers?.default.url[0] || "",
+          blockExplorerUrl: chain.blockExplorers?.default.url[0] || "",
           ticker: chain.nativeCurrency?.symbol || "ETH",
           tickerName: chain.nativeCurrency?.name || "Ethereum",
-          decimals: chain.nativeCurrency.decimals || 18,
+          decimals: chain.nativeCurrency?.decimals || 18,
+          logo: chain.nativeCurrency?.symbol
+            ? `https://images.toruswallet.io/${chain.nativeCurrency?.symbol.toLowerCase()}.svg`
+            : "https://images.toruswallet.io/eth.svg",
         });
         log.info("Chain Added: ", chain.name);
         await web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
