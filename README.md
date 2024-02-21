@@ -43,8 +43,7 @@ For using Web3Auth in the web, you have two choices of SDKs to get started with.
 ### Installation (Web3Auth Plug and Play Modal)
 
 ```shell
-npm install --save @web3auth/modal
-npm install --save @web3auth/web3auth-wagmi-connector
+npm install --save @web3auth/modal @web3auth/ethereum-provider @web3auth/web3auth-wagmi-connector
 ```
 
 ### Get your Client ID from Web3Auth Dashboard
@@ -60,48 +59,49 @@ Here is an example of a wagmi client using both the `Web3AuthConnector` and the 
 ```js
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 import { Web3Auth } from "@web3auth/modal";
-import { createConfig, WagmiConfig, configureChains } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { publicProvider } from "wagmi/providers/public";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
+import { CHAIN_NAMESPACES, WEB3AUTH_NETWORK } from "@web3auth/base";
+import { WagmiProvider, createConfig, http, } from "wagmi";
+import { sepolia, mainnet } from "wagmi/chains";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
 
 // Configure chains & providers with the Alchemy provider.
 // Popular providers are Alchemy (alchemy.com), Infura (infura.io), Quicknode (quicknode.com) etc.
 const { chains, publicClient, webSocketPublicClient } = configureChains([mainnet, arbitrum, polygon], [publicProvider()]);
 
 // Instantiating Web3Auth
+const name = "My App Name";
+const chainConfig = {
+  chainNamespace: CHAIN_NAMESPACES.EIP155,
+  chainId: "0x" + mainnet.id.toString(16),
+  rpcTarget: mainnet.rpcUrls.default.http[0], // This is the public RPC we have added, please pass on your own endpoint while creating an app
+  displayName: mainnet.name,
+  tickerName: mainnet.nativeCurrency?.name,
+  ticker: mainnet.nativeCurrency?.symbol,
+  blockExplorerUrl: mainnet.blockExplorers?.default.url[0] as string,
+};
+
+const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
+
 const web3AuthInstance = new Web3Auth({
-  clientId: "YOUR_CLIENT_ID",
-  chainConfig: {
-    chainNamespace: CHAIN_NAMESPACES.EIP155,
-    chainId: "0x" + chains[0].id.toString(16),
-    rpcTarget: chains[0].rpcUrls.default, // This is the public RPC we have added, please pass on your own endpoint while creating an app
-    displayName: chains[0].name,
-    tickerName: chains[0].nativeCurrency?.name,
-    ticker: chains[0].nativeCurrency?.symbol,
-    blockExplorer: chains[0]?.blockExplorers.default?.url,
-  },
-  web3AuthNetwork: "cyan",
+  clientId: "YOUR_WEB3AUTH_CLIENT_ID",
+  chainConfig,
+  privateKeyProvider,
+  web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
 });
 
-const wagmiConfig = createConfig({
-  autoConnect: true,
+const queryClient = new QueryClient() 
+
+// Set up client
+const config = createConfig({
+  chains: [mainnet, sepolia],
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+  },
   connectors: [
-    new Web3AuthConnector({
-      chains,
-      options: {
-        web3AuthInstance,
-      },
-    }),
-    new InjectedConnector({
-      chains,
-      options: {
-        name: "Injected",
-        shimDisconnect: true,
-      },
-    }),
+    {web3AuthInstance},
   ],
-  publicClient,
-  webSocketPublicClient,
 });
 ```
 
