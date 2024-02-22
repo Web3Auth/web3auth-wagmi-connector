@@ -1,6 +1,6 @@
 {
   "name": "@web3auth/web3auth-wagmi-connector",
-  "version": "5.0.1",
+  "version": "6.0.0",
   "description": "wagmi connector to connect with web3auth SDK",
   "main": "dist/web3authWagmiConnector.cjs.js",
   "unpkg": "dist/web3authWagmiConnector.umd.min.js",
