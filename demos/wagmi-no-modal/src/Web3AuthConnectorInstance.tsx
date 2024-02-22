@@ -3,9 +3,8 @@ import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { CHAIN_NAMESPACES } from "@web3auth/base";
-import { TorusWalletConnectorPlugin } from "@web3auth/torus-wallet-connector-plugin";
-import { Chain } from "wagmi";
+import { CHAIN_NAMESPACES, UX_MODE, WEB3AUTH_NETWORK } from "@web3auth/base";
+import { Chain } from "wagmi/chains";
 
 const name = "My App Name";
 const iconUrl = "https://web3auth.io/docs/contents/logo-ethereum.png";
@@ -20,58 +19,37 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
     displayName: chains[0].name,
     tickerName: chains[0].nativeCurrency?.name,
     ticker: chains[0].nativeCurrency?.symbol,
-    blockExplorer: chains[0].blockExplorers?.default.url[0] as string,
+    blockExplorerUrl: chains[0].blockExplorers?.default.url[0] as string,
   }
-
-  const web3AuthInstance = new Web3AuthNoModal({
-    clientId: "openlogin",
-    chainConfig,
-    web3AuthNetwork: "testnet",
-  });
 
   const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
 
+  const web3AuthInstance = new Web3AuthNoModal({
+    clientId: "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ",
+    privateKeyProvider,
+    web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+  });
+
+
   // Add openlogin adapter for customisations
   const openloginAdapterInstance = new OpenloginAdapter({
-    privateKeyProvider,
     adapterSettings: {
-      network: "testnet",
-      uxMode: "popup",
+      uxMode: UX_MODE.REDIRECT,
       whiteLabel: {
         appName: name,
         logoLight: iconUrl,
         logoDark: iconUrl,
         defaultLanguage: "en",
-        mode: "dark", // whether to enable dark mode. defaultValue: false
+        mode: "light", // whether to enable dark mode. defaultValue: false
       },
     },
   });
   web3AuthInstance.configureAdapter(openloginAdapterInstance);
 
-  // Add Torus Wallet Plugin (optional)
-  const torusPlugin = new TorusWalletConnectorPlugin({
-    torusWalletOpts: {
-      buttonPosition: "bottom-left",
-    },
-    walletInitOptions: {
-      whiteLabel: {
-        theme: { isDark: false, colors: { primary: "#00a8ff" } },
-        logoDark: iconUrl,
-        logoLight: iconUrl,
-      },
-      useWalletConnect: true,
-      enableLogging: true,
-    },
-  });
-  web3AuthInstance.addPlugin(torusPlugin);
-
-  return new Web3AuthConnector({
-    chains: chains,
-    options: {
+  return Web3AuthConnector({
       web3AuthInstance,
       loginParams: {
         loginProvider: "google",
       },
-    },
   });
 }

@@ -1,34 +1,45 @@
-import { usePrepareSendTransaction, useSendTransaction, useWaitForTransaction } from "wagmi";
-import { parseEther } from "viem";
+import { FormEvent } from "react";
+import { useWaitForTransactionReceipt, useSendTransaction, BaseError } from "wagmi";
+import { Hex, parseEther } from "viem";
 
-export const SendTransaction = () => {
-  const { config } = usePrepareSendTransaction({
-    //@ts-ignore
-    request: {
-      to: "0x2E464670992574A613f10F7682D5057fB507Cc21",
-      value: parseEther("0.00073"),
-    },
-  });
+export function SendTransaction() {
+  const { data: hash, error, isPending, sendTransaction } = useSendTransaction()
 
-  const { data, sendTransaction } = useSendTransaction(config);
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const to = formData.get('address') as Hex
+    const value = formData.get('value') as string
+    sendTransaction({ to, value: parseEther(value) })
+  }
 
-  const { isLoading, isSuccess, isError, isIdle } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-
-  if (isLoading) return <div>Check Wallet</div>;
-
-  if (isIdle)
-    return (
-      <button className="card" disabled={isLoading} onClick={() => sendTransaction}>
-        Send Transaction
-      </button>
-    );
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
 
   return (
     <div>
-      {isSuccess && <div>Transaction: {JSON.stringify(data)}</div>}
-      {isError && <div>Error sending transaction</div>}
+      <h2>Send Transaction</h2>
+      <form onSubmit={submit}>
+        <input name="address" placeholder="Address" required />
+        <input
+          name="value"
+          placeholder="Amount (ETH)"
+          type="number"
+          step="0.000000001"
+          required
+        />
+        <button disabled={isPending} type="submit">
+          {isPending ? 'Confirming...' : 'Send'}
+        </button>
+      </form>
+      {hash && <div>Transaction Hash: {hash}</div>}
+      {isConfirming && 'Waiting for confirmation...'}
+      {isConfirmed && 'Transaction confirmed.'}
+      {error && (
+        <div>Error: {(error as BaseError).shortMessage || error.message}</div>
+      )}
     </div>
-  );
-};
+  )
+}

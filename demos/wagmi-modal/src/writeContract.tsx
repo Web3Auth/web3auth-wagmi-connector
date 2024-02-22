@@ -1,51 +1,43 @@
-import { useState } from 'react'
-import { useContractWrite, usePrepareContractWrite } from 'wagmi'
+import { FormEvent, } from 'react'
+import { useWaitForTransactionReceipt, useWriteContract, BaseError } from 'wagmi';
+import { parseAbi } from 'viem';
 
 
-export const WriteContract = () => {
-  const [message, setMessage] = useState<string>('')
+export function WriteContract() {
+  const { data: hash, error, isPending, writeContract } = useWriteContract()
 
-  //@ts-ignore
-  const { config } = usePrepareContractWrite({
-    address: '0xD65AF91Bbb4334711A598dFD293596E6dc2d8313',
-    abi: [
-      {
-        name: 'update',
-        type: 'function',
-        stateMutability: 'nonpayable',
-        inputs: [{ internalType: 'string', name: 'message', type: 'string' }],
-        outputs: [],
-      },
-    ],
-    functionName: 'update',
-    args: [message],
-    enabled: Boolean(message),
-  })
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const tokenId = formData.get('tokenId') as string
+    writeContract({
+      address: '0xFBA3912Ca04dd458c843e2EE08967fC04f3579c2',
+      abi: parseAbi(['function mint(uint256 tokenId)']),
+      functionName: 'mint',
+      args: [BigInt(tokenId)],
+    })
+  }
 
-  const { write, data, error, isLoading, isError, isSuccess } =
-    useContractWrite(config as any)
-
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    })
 
   return (
     <div>
-      <div>Update Message</div>
-      <div>
-        <input
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Updated Message"
-          value={message}
-        />
-        <button
-          disabled={isLoading}
-          onClick={() =>
-            write?.()
-          }
-        >
-          Mint
+      <h2>Write Contract</h2>
+      <form onSubmit={submit}>
+        <input name="tokenId" placeholder="Token ID" required />
+        <button disabled={isPending} type="submit">
+          {isPending ? 'Confirming...' : 'Mint'}
         </button>
-      </div>
-      {isError && <div>{error?.message}</div>}
-      {isSuccess && <div>Transaction hash: {data?.hash}</div>}
+      </form>
+      {hash && <div>Transaction Hash: {hash}</div>}
+      {isConfirming && 'Waiting for confirmation...'}
+      {isConfirmed && 'Transaction confirmed.'}
+      {error && (
+        <div>Error: {(error as BaseError).shortMessage || error.message}</div>
+      )}
     </div>
   )
 }

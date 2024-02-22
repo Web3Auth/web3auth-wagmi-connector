@@ -1,51 +1,40 @@
-import '@/styles/globals.css'
+import "@/styles/globals.css";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // WAGMI Libraries
-import { WagmiConfig, createConfig, configureChains } from "wagmi";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
-import { arbitrum, mainnet, polygon } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
+import { createConfig, http, useAccount, useConnect, useDisconnect, WagmiProvider } from "wagmi";
+import { mainnet, polygon, sepolia } from "wagmi/chains";
+import { coinbaseWallet, walletConnect } from "wagmi/connectors";
 
+import Balance from "./_balance";
+import SendTransaction from "./_sendTransaction";
+import SwitchChain from "./_switchNetwork";
 import Web3AuthConnectorInstance from "./_Web3AuthConnectorInstance";
+import WriteContract from "./_writeContract";
 
-// Configure chains & providers with the Public provider.
-const { chains, publicClient, webSocketPublicClient } = configureChains([mainnet, arbitrum, polygon], [publicProvider()]);
+const queryClient = new QueryClient();
 
 // Set up client
 const config = createConfig({
-  autoConnect: true,
+  chains: [mainnet, sepolia, polygon],
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+    [polygon.id]: http(),
+  },
   connectors: [
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: "wagmi",
-      },
+    walletConnect({
+      projectId: "3314f39613059cb687432d249f1658d2",
+      showQrModal: true,
     }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: "3314f39613059cb687432d249f1658d2",
-        showQrModal: true,
-      },
-    }),
-    new InjectedConnector({
-      chains,
-      options: {
-        name: "Injected",
-        shimDisconnect: true,
-      },
-    }),
-    Web3AuthConnectorInstance(chains) as any,
+    coinbaseWallet({ appName: "wagmi" }),
+    Web3AuthConnectorInstance([mainnet, sepolia, polygon]),
   ],
-  publicClient,
-  webSocketPublicClient,
 });
 
 function Profile() {
   const { address, connector, isConnected } = useAccount();
-  const { connect, connectors, error, isLoading, pendingConnector } = useConnect();
+  const { connect, connectors, error } = useConnect();
   const { disconnect } = useDisconnect();
 
   if (isConnected) {
@@ -56,32 +45,37 @@ function Profile() {
         <button className="card" onClick={disconnect as any}>
           Disconnect
         </button>
-      </div>
-    );
-  } else {
-    return (
-      <div className="main">
-        {connectors.map((connector) => {
-          return (
-            <button className="card" key={connector.id} onClick={() => connect({ connector })}>
-              {connector.name}
-            </button>
-          );
-        })}
-        {error && <div>{error.message}</div>}
+        <SendTransaction />
+        <Balance />
+        <WriteContract />
+        <SwitchChain />
       </div>
     );
   }
+  return (
+    <div className="main">
+      {connectors.map((currentConnector) => {
+        return (
+          <button className="card" key={currentConnector.id} onClick={() => connect({ connector: currentConnector })}>
+            {currentConnector.name}
+          </button>
+        );
+      })}
+      {error && <div>{error.message}</div>}
+    </div>
+  );
 }
 
 // Pass client to React Context Provider
 function App() {
   return (
-    <WagmiConfig config={config}>
-      <div className="container">
-        <Profile />
-      </div>
-    </WagmiConfig>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <div className="container">
+          <Profile />
+        </div>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 
