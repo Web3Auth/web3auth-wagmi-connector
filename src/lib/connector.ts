@@ -18,8 +18,8 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
   const { web3AuthInstance, loginParams, modalConfig } = parameters;
 
   return createConnector<Provider>((config) => ({
-    id: "web3auth",
-    name: "Web3Auth",
+    id: loginParams?.loginProvider || "web3auth",
+    name: loginParams?.loginProvider ? loginParams.loginProvider.charAt(0).toUpperCase() + loginParams.loginProvider.slice(1) : "Web3Auth",
     type: "Web3Auth",
     async connect({ chainId } = {}) {
       try {
@@ -71,7 +71,9 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
     },
     async getChainId() {
       const provider = await this.getProvider();
-      const chainId = await provider.request<unknown, number>({ method: "eth_chainId" });
+      const chainId = await provider.request<unknown, number>({
+        method: "eth_chainId",
+      });
       return normalizeChainId(chainId);
     },
     async getProvider(): Promise<Provider> {
@@ -121,7 +123,9 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
             : "https://images.toruswallet.io/eth.svg",
         });
         log.info("Chain Added: ", chain.name);
-        await web3AuthInstance.switchChain({ chainId: `0x${chain.id.toString(16)}` });
+        await web3AuthInstance.switchChain({
+          chainId: `0x${chain.id.toString(16)}`,
+        });
         log.info("Chain Switched to ", chain.name);
         config.emitter.emit("change", {
           chainId,
