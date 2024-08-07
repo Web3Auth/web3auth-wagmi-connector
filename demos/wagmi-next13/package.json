@@ -25,7 +25,7 @@
     "react-dom": "18.2.0",
     "typescript": "^5.3.3",
     "viem": "^2.7.11",
-    "wagmi": "^2.5.7"
+    "wagmi": "^2.12.4"
   },
   "browserslist": {
     "production": [
