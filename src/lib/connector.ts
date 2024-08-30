@@ -112,7 +112,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
           chainId: `0x${chain.id.toString(16)}`,
           rpcTarget: chain.rpcUrls.default.http[0],
           displayName: chain.name,
-          blockExplorerUrl: chain.blockExplorers?.default.url[0] || "",
+          blockExplorerUrl: chain.blockExplorers?.default.url || "",
           ticker: chain.nativeCurrency?.symbol || "ETH",
           tickerName: chain.nativeCurrency?.name || "Ethereum",
           decimals: chain.nativeCurrency?.decimals || 18,
