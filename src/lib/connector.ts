@@ -36,7 +36,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
           if (isIWeb3AuthModal(web3AuthInstance)) {
             await web3AuthInstance.connect();
           } else if (loginParams) {
-            await web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, loginParams);
+            await web3AuthInstance.connectTo(WALLET_ADAPTERS.AUTH, loginParams);
           } else {
             log.error("please provide valid loginParams when using @web3auth/no-modal");
             throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
@@ -146,7 +146,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
         });
     },
     onChainChanged(chain) {
-      const chainId = normalizeChainId(chain);
+      const chainId = Number(chain);
       config.emitter.emit("change", { chainId });
     },
     onDisconnect(): void {
