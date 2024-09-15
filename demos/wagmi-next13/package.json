@@ -9,23 +9,23 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.22.2",
+    "@tanstack/react-query": "^5.56.2",
     "@types/node": "20.11.19",
-    "@types/react": "18.2.57",
-    "@types/react-dom": "18.2.19",
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
     "@walletconnect/modal": "^2.6.2",
-    "@web3auth/base": "^8.12.0",
-    "@web3auth/ethereum-provider": "^8.12.0",
-    "@web3auth/modal": "^8.12.1",
+    "@web3auth/base": "^9.0.0-alpha.6",
+    "@web3auth/ethereum-provider": "^9.0.0-alpha.6",
+    "@web3auth/modal": "^9.0.0-alpha.6",
     "@web3auth/web3auth-wagmi-connector": "file:../../",
     "eslint": "8.56.0",
     "eslint-config-next": "13.4.5",
-    "next": "13.4.5",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "typescript": "^5.3.3",
-    "viem": "^2.7.11",
-    "wagmi": "^2.5.7"
+    "next": "14.2.11",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "^5.6.2",
+    "viem": "^2.21.7",
+    "wagmi": "^2.12.11"
   },
   "browserslist": {
     "production": [

@@ -15,7 +15,7 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
     displayName: chains[0].name,
     tickerName: chains[0].nativeCurrency?.name,
     ticker: chains[0].nativeCurrency?.symbol,
-    blockExplorerUrl: chains[0].blockExplorers?.default.url[0] as string,
+    blockExplorerUrl: chains[0].blockExplorers?.default.url as string,
   };
 
   const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
