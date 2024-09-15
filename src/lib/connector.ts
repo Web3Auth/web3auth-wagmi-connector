@@ -15,12 +15,12 @@ function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModa
 export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
   let walletProvider: Provider | null = null;
 
-  const { web3AuthInstance, loginParams, modalConfig } = parameters;
+  const { web3AuthInstance, loginParams, modalConfig, id, name, type } = parameters;
 
   return createConnector<Provider>((config) => ({
-    id: "web3auth",
-    name: "Web3Auth",
-    type: "Web3Auth",
+    id: id || "web3auth",
+    name: name || "Web3Auth",
+    type: type || "Web3Auth",
     async connect({ chainId } = {}) {
       try {
         config.emitter.emit("message", {
@@ -112,7 +112,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
           chainId: `0x${chain.id.toString(16)}`,
           rpcTarget: chain.rpcUrls.default.http[0],
           displayName: chain.name,
-          blockExplorerUrl: chain.blockExplorers?.default.url[0] || "",
+          blockExplorerUrl: chain.blockExplorers?.default.url || "",
           ticker: chain.nativeCurrency?.symbol || "ETH",
           tickerName: chain.nativeCurrency?.name || "Ethereum",
           decimals: chain.nativeCurrency?.decimals || 18,

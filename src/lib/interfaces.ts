@@ -6,6 +6,9 @@ export interface Web3AuthConnectorParams {
   web3AuthInstance: IWeb3Auth | IWeb3AuthModal;
   loginParams?: OpenloginLoginParams;
   modalConfig?: Record<WALLET_ADAPTER_TYPE, ModalConfig>;
+  id?: string;
+  name?: string;
+  type?: string;
 }
 
 export type Provider = IProvider;
