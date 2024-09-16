@@ -45,5 +45,8 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
       loginParams: {
         loginProvider: "google",
       },
+      name: "Google Login",
+      id: "google",
+      type: "google",
   });
 }
