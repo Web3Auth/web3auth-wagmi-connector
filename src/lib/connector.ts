@@ -1,4 +1,4 @@
-import { ChainNotConfiguredError, createConnector, normalizeChainId } from "@wagmi/core";
+import { ChainNotConfiguredError, createConnector } from "@wagmi/core";
 import type { IWeb3Auth } from "@web3auth/base";
 import * as pkg from "@web3auth/base";
 import type { IWeb3AuthModal } from "@web3auth/modal";
@@ -72,7 +72,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
     async getChainId() {
       const provider = await this.getProvider();
       const chainId = await provider.request<unknown, number>({ method: "eth_chainId" });
-      return normalizeChainId(chainId);
+      return Number(chainId);
     },
     async getProvider(): Promise<Provider> {
       if (walletProvider) {
