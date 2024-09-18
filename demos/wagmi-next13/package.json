@@ -11,21 +11,21 @@
   "dependencies": {
     "@tanstack/react-query": "^5.56.2",
     "@types/node": "20.11.19",
-    "@types/react": "18.3.5",
+    "@types/react": "18.3.7",
     "@types/react-dom": "18.3.0",
     "@walletconnect/modal": "^2.6.2",
-    "@web3auth/base": "^9.0.0-alpha.6",
-    "@web3auth/ethereum-provider": "^9.0.0-alpha.6",
-    "@web3auth/modal": "^9.0.0-alpha.6",
+    "@web3auth/base": "^9.0.0",
+    "@web3auth/ethereum-provider": "^9.0.0",
+    "@web3auth/modal": "^9.0.0",
     "@web3auth/web3auth-wagmi-connector": "file:../../",
     "eslint": "8.56.0",
     "eslint-config-next": "13.4.5",
-    "next": "14.2.11",
+    "next": "14.2.12",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "typescript": "^5.6.2",
-    "viem": "^2.21.7",
-    "wagmi": "^2.12.11"
+    "viem": "^2.21.9",
+    "wagmi": "^2.12.12"
   },
   "browserslist": {
     "production": [

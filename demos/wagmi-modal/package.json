@@ -5,19 +5,19 @@
   "dependencies": {
     "@tanstack/react-query": "^5.56.2",
     "@types/node": "^18.11.18",
-    "@types/react": "^18.3.5",
+    "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "@web3auth/base": "^9.0.0-alpha.8",
-    "@web3auth/ethereum-provider": "^9.0.0-alpha.8",
-    "@web3auth/modal": "^9.0.0-alpha.8",
+    "@web3auth/base": "^9.0.0",
+    "@web3auth/ethereum-provider": "^9.0.0",
+    "@web3auth/modal": "^9.0.0",
     "@web3auth/web3auth-wagmi-connector": "file:../../",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "typescript": "^5.6.2",
-    "viem": "^2.21.7",
-    "vite": "^5.4.5",
-    "wagmi": "^2.12.11"
+    "viem": "^2.21.9",
+    "vite": "^5.4.6",
+    "wagmi": "^2.12.12"
   },
   "devDependencies": {
     "buffer": "^6.0.3",
