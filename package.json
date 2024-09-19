@@ -4,7 +4,6 @@
   "description": "wagmi connector to connect with web3auth SDK",
   "sideEffects": false,
   "main": "dist/lib.cjs/index.js",
-  "module": "dist/lib.esm/index.js",
   "jsdelivr": "dist/web3authWagmiConnector.umd.min.js",
   "types": "dist/types/index.d.ts",
   "repository": "https://github.com/Web3Auth/web3auth-wagmi-connector",
@@ -13,8 +12,8 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/web3authWagmiConnector.esm.js",
-      "require": "./dist/web3authWagmiConnector.cjs.js"
+      "import": "./dist/lib.esm/index.js",
+      "require": "./dist/lib.cjs/index.js"
     }
   },
   "keywords": [
@@ -75,8 +74,7 @@
     ]
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
