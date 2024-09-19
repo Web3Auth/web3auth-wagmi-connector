@@ -2,12 +2,13 @@
   "name": "@web3auth/web3auth-wagmi-connector",
   "version": "6.0.0",
   "description": "wagmi connector to connect with web3auth SDK",
-  "main": "dist/web3authWagmiConnector.cjs.js",
-  "unpkg": "dist/web3authWagmiConnector.umd.min.js",
+  "sideEffects": false,
+  "main": "dist/lib.cjs/index.js",
+  "module": "dist/lib.esm/index.js",
   "jsdelivr": "dist/web3authWagmiConnector.umd.min.js",
   "types": "dist/types/index.d.ts",
   "repository": "https://github.com/Web3Auth/web3auth-wagmi-connector",
-  "license": "MIT",
+  "license": "ISC",
   "type": "module",
   "exports": {
     ".": {
@@ -16,7 +17,13 @@
       "require": "./dist/web3authWagmiConnector.cjs.js"
     }
   },
-  "keywords": [],
+  "keywords": [
+    "web3Auth/wagmi",
+    "wagmi",
+    "web3Auth",
+    "blockchain",
+    "ethereum"
+  ],
   "scripts": {
     "dev": "torus-scripts start",
     "build": "torus-scripts build",
@@ -26,34 +33,34 @@
     "pre-commit": "lint-staged --cwd ."
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "@toruslabs/config": "^2.0.2",
-    "@toruslabs/eslint-config-typescript": "^3.1.0",
-    "@toruslabs/torus-scripts": "^5.2.0",
+    "@changesets/cli": "^2.27.8",
+    "@toruslabs/config": "^2.2.0",
+    "@toruslabs/eslint-config-typescript": "^3.3.3",
+    "@toruslabs/torus-scripts": "^6.1.2",
     "@types/node": "^20",
-    "@wagmi/core": "^2.6.5",
-    "@web3auth/base": "^8.12.0",
-    "@web3auth/modal": "^8.12.1",
-    "@web3auth/no-modal": "^8.12.0",
-    "@web3auth/openlogin-adapter": "^8.12.0",
+    "@wagmi/core": "^2.13.5",
+    "@web3auth/base": "^9.0.0",
+    "@web3auth/modal": "^9.0.0",
+    "@web3auth/no-modal": "^9.0.0",
+    "@web3auth/auth-adapter": "^9.0.0",
     "changeset": "^0.2.6",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "prettier": "^3.2.5",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
-    "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
-    "viem": "^2.7.11"
+    "tslib": "^2.7.0",
+    "typescript": "^5.6.2",
+    "viem": "^2.21.9"
   },
   "peerDependencies": {
     "@wagmi/core": "^2.x",
-    "@web3auth/base": "^8.x",
-    "@web3auth/modal": "^8.x",
-    "@web3auth/no-modal": "^8.x",
-    "@web3auth/openlogin-adapter": "^8.x",
+    "@web3auth/base": "^9.x",
+    "@web3auth/modal": "^9.x",
+    "@web3auth/no-modal": "^9.x",
+    "@web3auth/auth-adapter": "^9.x",
     "viem": "^2.x"
   },
   "peerDependenciesMeta": {

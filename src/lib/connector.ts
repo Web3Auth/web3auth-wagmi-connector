@@ -1,4 +1,4 @@
-import { ChainNotConfiguredError, createConnector, normalizeChainId } from "@wagmi/core";
+import { ChainNotConfiguredError, createConnector } from "@wagmi/core";
 import type { IWeb3Auth } from "@web3auth/base";
 import * as pkg from "@web3auth/base";
 import type { IWeb3AuthModal } from "@web3auth/modal";
@@ -15,12 +15,12 @@ function isIWeb3AuthModal(obj: IWeb3Auth | IWeb3AuthModal): obj is IWeb3AuthModa
 export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
   let walletProvider: Provider | null = null;
 
-  const { web3AuthInstance, loginParams, modalConfig } = parameters;
+  const { web3AuthInstance, loginParams, modalConfig, id, name, type } = parameters;
 
   return createConnector<Provider>((config) => ({
-    id: "web3auth",
-    name: "Web3Auth",
-    type: "Web3Auth",
+    id: id || "web3auth",
+    name: name || "Web3Auth",
+    type: type || "Web3Auth",
     async connect({ chainId } = {}) {
       try {
         config.emitter.emit("message", {
@@ -36,7 +36,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
           if (isIWeb3AuthModal(web3AuthInstance)) {
             await web3AuthInstance.connect();
           } else if (loginParams) {
-            await web3AuthInstance.connectTo(WALLET_ADAPTERS.OPENLOGIN, loginParams);
+            await web3AuthInstance.connectTo(WALLET_ADAPTERS.AUTH, loginParams);
           } else {
             log.error("please provide valid loginParams when using @web3auth/no-modal");
             throw new UserRejectedRequestError("please provide valid loginParams when using @web3auth/no-modal" as unknown as Error);
@@ -72,7 +72,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
     async getChainId() {
       const provider = await this.getProvider();
       const chainId = await provider.request<unknown, number>({ method: "eth_chainId" });
-      return normalizeChainId(chainId);
+      return Number(chainId);
     },
     async getProvider(): Promise<Provider> {
       if (walletProvider) {
@@ -112,7 +112,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
           chainId: `0x${chain.id.toString(16)}`,
           rpcTarget: chain.rpcUrls.default.http[0],
           displayName: chain.name,
-          blockExplorerUrl: chain.blockExplorers?.default.url[0] || "",
+          blockExplorerUrl: chain.blockExplorers?.default.url || "",
           ticker: chain.nativeCurrency?.symbol || "ETH",
           tickerName: chain.nativeCurrency?.name || "Ethereum",
           decimals: chain.nativeCurrency?.decimals || 18,
@@ -146,7 +146,7 @@ export function Web3AuthConnector(parameters: Web3AuthConnectorParams) {
         });
     },
     onChainChanged(chain) {
-      const chainId = normalizeChainId(chain);
+      const chainId = Number(chain);
       config.emitter.emit("change", { chainId });
     },
     onDisconnect(): void {
